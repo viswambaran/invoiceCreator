@@ -7,20 +7,26 @@
                     "x": 322.45,
                     "y": 329.99
                 },
+                "column_width": 87.18,
+                "cell_rect": {
+                    "x0": 322.45,
+                    "y0": 336.99,
+                    "x1": 409.63,
+                    "y1": 359.99
+                },
+                "safe_clear_rect": {
+                    "x0": 324.45,
+                    "y0": 348.22,
+                    "x1": 407.63,
+                    "y1": 357.74
+                },
                 "write_position": {
-                    "x": 304.36,
-                    "y": 360.73,
+                    "x": 326.45,
+                    "y": 356.99,
                     "align": "left"
                 },
-                "value_rect": {
-                    "x0": 301.36,
-                    "y0": 348.44,
-                    "x1": 372.63,
-                    "y1": 361.73
-                },
-                "column_width": 71.27,
                 "font": {
-                    "name": "ArialMT",
+                    "name": "Arial,Bold",
                     "size": 8.27,
                     "colour": {
                         "r": 0,
@@ -28,7 +34,7 @@
                         "b": 0
                     },
                     "style": {
-                        "bold": false,
+                        "bold": true,
                         "italic": false,
                         "serif": false,
                         "monospace": false
@@ -40,20 +46,26 @@
                     "x": 409.63,
                     "y": 329.99
                 },
+                "column_width": 51.19,
+                "cell_rect": {
+                    "x0": 409.63,
+                    "y0": 336.99,
+                    "x1": 460.82,
+                    "y1": 359.99
+                },
+                "safe_clear_rect": {
+                    "x0": 411.63,
+                    "y0": 348.22,
+                    "x1": 458.82,
+                    "y1": 357.74
+                },
                 "write_position": {
-                    "x": 412.37,
-                    "y": 360.73,
+                    "x": 409.63,
+                    "y": 356.99,
                     "align": "right"
                 },
-                "value_rect": {
-                    "x0": 409.37,
-                    "y0": 348.44,
-                    "x1": 433.76,
-                    "y1": 361.73
-                },
-                "column_width": 24.39,
                 "font": {
-                    "name": "ArialMT",
+                    "name": "Arial,Bold",
                     "size": 8.27,
                     "colour": {
                         "r": 0,
@@ -61,7 +73,7 @@
                         "b": 0
                     },
                     "style": {
-                        "bold": false,
+                        "bold": true,
                         "italic": false,
                         "serif": false,
                         "monospace": false
@@ -73,20 +85,26 @@
                     "x": 460.82,
                     "y": 329.99
                 },
+                "column_width": 52.15,
+                "cell_rect": {
+                    "x0": 460.82,
+                    "y0": 336.99,
+                    "x1": 512.97,
+                    "y1": 359.99
+                },
+                "safe_clear_rect": {
+                    "x0": 462.82,
+                    "y0": 348.22,
+                    "x1": 510.97,
+                    "y1": 357.74
+                },
                 "write_position": {
-                    "x": 448.36,
-                    "y": 360.73,
+                    "x": 460.82,
+                    "y": 356.99,
                     "align": "right"
                 },
-                "value_rect": {
-                    "x0": 445.36,
-                    "y0": 348.44,
-                    "x1": 483.55,
-                    "y1": 361.73
-                },
-                "column_width": 38.19,
                 "font": {
-                    "name": "ArialMT",
+                    "name": "Arial,Bold",
                     "size": 8.27,
                     "colour": {
                         "r": 0,
@@ -94,7 +112,7 @@
                         "b": 0
                     },
                     "style": {
-                        "bold": false,
+                        "bold": true,
                         "italic": false,
                         "serif": false,
                         "monospace": false
@@ -106,20 +124,26 @@
                     "x": 512.97,
                     "y": 329.99
                 },
+                "column_width": 60.0,
+                "cell_rect": {
+                    "x0": 512.97,
+                    "y0": 336.99,
+                    "x1": 572.97,
+                    "y1": 359.99
+                },
+                "safe_clear_rect": {
+                    "x0": 514.97,
+                    "y0": 348.22,
+                    "x1": 570.97,
+                    "y1": 357.74
+                },
                 "write_position": {
-                    "x": 520.36,
-                    "y": 360.73,
+                    "x": 512.97,
+                    "y": 356.99,
                     "align": "right"
                 },
-                "value_rect": {
-                    "x0": 517.36,
-                    "y0": 348.44,
-                    "x1": 548.65,
-                    "y1": 361.73
-                },
-                "column_width": 31.29,
                 "font": {
-                    "name": "ArialMT",
+                    "name": "Arial,Bold",
                     "size": 8.27,
                     "colour": {
                         "r": 0,
@@ -127,7 +151,7 @@
                         "b": 0
                     },
                     "style": {
-                        "bold": false,
+                        "bold": true,
                         "italic": false,
                         "serif": false,
                         "monospace": false

@@ -1,56 +1,47 @@
 from invoice_creator.pdf.text_writer import (
-    write_in_area
+    write_metadata_value,
 )
 
 
 def format_table_value(
     column_name: str,
-    value
+    value,
 ) -> str:
 
     if column_name in {
         "rate",
-        "net"
+        "net",
     }:
         return f"{float(value):.2f}"
 
     if column_name == "units":
-
-        numeric_value = float(
-            value
-        )
+        numeric_value = float(value)
 
         if numeric_value.is_integer():
             return str(
                 int(numeric_value)
             )
 
-        return str(
-            numeric_value
-        )
+        return str(numeric_value)
 
-    return str(
-        value
-    )
+    return str(value)
 
 
 def write_lines(
     page,
     invoice,
-    table_metadata
+    table_metadata,
 ) -> None:
 
-    table = (
-        table_metadata
-        ["invoice_lines"]
-    )
+    table = table_metadata[
+        "invoice_lines"
+    ]
 
     columns = table[
         "columns"
     ]
 
     if len(invoice.lines) > table["max_rows"]:
-
         raise ValueError(
             f"Invoice {invoice.invoice_no} has "
             f"{len(invoice.lines)} lines, but the "
@@ -61,7 +52,6 @@ def write_lines(
     for row_index, line in enumerate(
         invoice.lines
     ):
-
         row_offset_y = (
             row_index
             * table["row_height"]
@@ -78,45 +68,40 @@ def write_lines(
                 line.rate,
 
             "net":
-                line.net
+                line.net,
         }
 
-        for column_name, value in (
-            values.items()
-        ):
-
+        for column_name, value in values.items():
             if column_name not in columns:
                 continue
 
-            column = columns[
+            metadata = columns[
                 column_name
             ]
 
-            write_in_area(
-                page=page,
+            alignment = (
+                metadata["write_position"]
+                .get(
+                    "align",
+                    "left",
+                )
+            )
 
+            write_metadata_value(
+                page=page,
                 value=format_table_value(
                     column_name,
-                    value
+                    value,
                 ),
-
-                value_rect=
-                    column["value_rect"],
-
-                write_position=
-                    column["write_position"],
-
-                font=
-                    column["font"],
-
-                align=
-                    column
-                    ["write_position"]
-                    .get(
-                        "align",
-                        "left"
-                    ),
-
-                row_offset_y=
-                    row_offset_y
+                metadata=metadata,
+                align=alignment,
+                row_offset_y=row_offset_y,
+                padding=(
+                    4
+                    if alignment == "right"
+                    else 0
+                ),
+                clear_padding_x=2.0,
+                clear_padding_top=1.0,
+                clear_padding_bottom=0.75,
             )

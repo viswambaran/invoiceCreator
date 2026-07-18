@@ -62,6 +62,11 @@ def save_json(
     path: Path
 ) -> None:
 
+    path.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
     with open(
         path,
         "w",
@@ -111,10 +116,8 @@ def find_inline_value(
     label: dict[str, Any]
 ) -> dict[str, Any] | None:
     """
-    Find the closest extracted value on the same line,
-    immediately to the right of the supplied label.
-
-    Used only for the three totals fields.
+    Find the nearest extracted item on the same line
+    and to the right of the supplied label.
     """
 
     label_rect = label["rect"]
@@ -138,12 +141,12 @@ def find_inline_value(
             <= 3
         )
 
-        is_to_right = (
+        to_the_right = (
             rect["x0"]
             >= label_rect["x1"]
         )
 
-        if same_line and is_to_right:
+        if same_line and to_the_right:
 
             candidates.append(
                 item
@@ -160,30 +163,72 @@ def find_inline_value(
     )
 
 
-def expand_rect(
-    rect: dict[str, float],
-    horizontal: float = 2,
-    vertical: float = 1
+def make_text_band(
+    x0: float,
+    x1: float,
+    baseline_y: float,
+    font_size: float,
+    left_inset: float = 1.0,
+    right_inset: float = 1.0
 ) -> dict[str, float]:
+    """
+    Produce a narrow whiteout rectangle around the text glyph band.
+
+    It deliberately avoids the top, bottom and vertical cell borders.
+    """
 
     return {
         "x0": round(
-            rect["x0"] - horizontal,
+            x0 + left_inset,
             2
         ),
 
         "y0": round(
-            rect["y0"] - vertical,
+            baseline_y
+            - font_size
+            - 0.5,
             2
         ),
 
         "x1": round(
-            rect["x1"] + horizontal,
+            x1 - right_inset,
             2
         ),
 
         "y1": round(
-            rect["y1"] + vertical,
+            baseline_y + 0.75,
+            2
+        )
+    }
+
+
+def exact_safe_rect(
+    rect: dict[str, float]
+) -> dict[str, float]:
+    """
+    Use the extracted text rectangle itself as the safe clear region.
+
+    No expansion is applied because totals sit inside tightly bordered rows.
+    """
+
+    return {
+        "x0": round(
+            rect["x0"],
+            2
+        ),
+
+        "y0": round(
+            rect["y0"],
+            2
+        ),
+
+        "x1": round(
+            rect["x1"],
+            2
+        ),
+
+        "y1": round(
+            rect["y1"],
             2
         )
     }
@@ -198,10 +243,6 @@ def build_fields(
         dict[str, Any]
     ] = {}
 
-
-    #
-    # Locate required labels
-    #
 
     for field_name, aliases in (
         FIELD_RULES.items()
@@ -227,14 +268,9 @@ def build_fields(
             )
 
 
-    required_fields = {
-        "Invoice No",
-        "Service User",
-        "Assessor",
-        "Net Amount",
-        "VAT",
-        "Invoice Total"
-    }
+    required_fields = set(
+        FIELD_RULES.keys()
+    )
 
     missing_fields = (
         required_fields
@@ -253,7 +289,7 @@ def build_fields(
         )
 
 
-    output = {
+    output: dict[str, Any] = {
         "template_name":
             metadata["template_name"],
 
@@ -280,9 +316,6 @@ def build_fields(
     #
     # Invoice No
     #
-    # Positioned twelve points after the end of
-    # the "Invoice No :" label.
-    #
 
     invoice_rect = (
         invoice_label["rect"]
@@ -290,6 +323,10 @@ def build_fields(
 
     invoice_font = (
         invoice_label["font"]
+    )
+
+    invoice_font_size = float(
+        invoice_font["size"]
     )
 
     invoice_write_x = round(
@@ -301,6 +338,30 @@ def build_fields(
         invoice_rect["y1"],
         2
     )
+
+    invoice_value_rect = {
+        "x0": round(
+            invoice_write_x - 2,
+            2
+        ),
+
+        "y0": round(
+            invoice_write_y
+            - invoice_font_size
+            - 2,
+            2
+        ),
+
+        "x1": round(
+            invoice_write_x + 70,
+            2
+        ),
+
+        "y1": round(
+            invoice_write_y + 2,
+            2
+        )
+    }
 
     output["fields"]["Invoice No"] = {
         "pdf_label":
@@ -320,31 +381,16 @@ def build_fields(
                 invoice_write_y
         },
 
-        "value_rect": {
-            "x0": round(
-                invoice_write_x - 2,
-                2
-            ),
+        "value_rect":
+            invoice_value_rect,
 
-            "y0": round(
-                invoice_write_y
-                - float(
-                    invoice_font["size"]
-                )
-                - 2,
-                2
+        "safe_clear_rect":
+            make_text_band(
+                x0=invoice_value_rect["x0"],
+                x1=invoice_value_rect["x1"],
+                baseline_y=invoice_write_y,
+                font_size=invoice_font_size
             ),
-
-            "x1": round(
-                invoice_write_x + 70,
-                2
-            ),
-
-            "y1": round(
-                invoice_write_y + 2,
-                2
-            )
-        },
 
         "font":
             invoice_font
@@ -355,49 +401,90 @@ def build_fields(
     # Service User
     #
 
-    service_rect = service_label["rect"]
-    service_font = service_label["font"]
+    service_rect = (
+        service_label["rect"]
+    )
+
+    service_font = (
+        service_label["font"]
+    )
+
+    service_font_size = float(
+        service_font["size"]
+    )
+
+    service_write_x = round(
+        service_rect["x0"] + 4,
+        2
+    )
 
     service_write_y = round(
         service_rect["y1"] + 18,
         2
     )
 
+    service_cell_x0 = float(
+        service_rect["x0"]
+    )
+
+    service_cell_x1 = round(
+        assessor_label["rect"]["x0"],
+        2
+    )
+
+    service_value_rect = {
+        "x0":
+            service_cell_x0,
+
+        "y0": round(
+            service_write_y
+            - service_font_size
+            - 2,
+            2
+        ),
+
+        "x1":
+            service_cell_x1,
+
+        "y1": round(
+            service_write_y + 2,
+            2
+        )
+    }
+
     output["fields"]["Service User"] = {
-        "pdf_label": service_label["text"],
-        "page": service_label["page"],
-        "label_rect": service_rect,
+        "pdf_label":
+            service_label["text"],
+
+        "page":
+            service_label["page"],
+
+        "label_rect":
+            service_rect,
 
         "write_position": {
-            "x": round(
-                service_rect["x0"] + 4,
-                2
-            ),
-            "y": service_write_y
-        },
+            "x":
+                service_write_x,
 
-        "value_rect": {
-            "x0": round(
-                service_rect["x0"],
-                2
-            ),
-            "y0": round(
+            "y":
                 service_write_y
-                - float(service_font["size"])
-                - 2,
-                2
-            ),
-            "x1": round(
-                assessor_label["rect"]["x0"] - 2,
-                2
-            ),
-            "y1": round(
-                service_write_y + 2,
-                2
-            )
         },
 
-        "font": service_font
+        "value_rect":
+            service_value_rect,
+
+        "safe_clear_rect":
+            make_text_band(
+                x0=service_cell_x0,
+                x1=service_cell_x1,
+                baseline_y=service_write_y,
+                font_size=service_font_size,
+                left_inset=2,
+                right_inset=2
+            ),
+
+        "font":
+            service_font
     }
 
 
@@ -405,8 +492,27 @@ def build_fields(
     # BIA/DR / Assessor
     #
 
-    assessor_rect = assessor_label["rect"]
-    assessor_font = assessor_label["font"]
+    assessor_rect = (
+        assessor_label["rect"]
+    )
+
+    assessor_font = (
+        assessor_label["font"]
+    )
+
+    assessor_font_size = float(
+        assessor_font["size"]
+    )
+
+    assessor_write_x = round(
+        assessor_rect["x0"] + 4,
+        2
+    )
+
+    assessor_write_y = round(
+        assessor_rect["y1"] + 18,
+        2
+    )
 
     description_header = find_field(
         metadata,
@@ -419,56 +525,81 @@ def build_fields(
     )
 
     if description_header:
-        assessor_right = round(
-            description_header["rect"]["x0"] - 2,
+
+        assessor_cell_x1 = round(
+            description_header["rect"]["x0"],
             2
         )
+
     else:
-        assessor_right = round(
+
+        assessor_cell_x1 = round(
             assessor_rect["x0"] + 175,
             2
         )
 
+    assessor_cell_x0 = float(
+        assessor_rect["x0"]
+    )
+
+    assessor_value_rect = {
+        "x0":
+            assessor_cell_x0,
+
+        "y0": round(
+            assessor_write_y
+            - assessor_font_size
+            - 2,
+            2
+        ),
+
+        "x1":
+            assessor_cell_x1,
+
+        "y1": round(
+            assessor_write_y + 2,
+            2
+        )
+    }
+
     output["fields"]["Assessor"] = {
-        "pdf_label": assessor_label["text"],
-        "page": assessor_label["page"],
-        "label_rect": assessor_rect,
+        "pdf_label":
+            assessor_label["text"],
+
+        "page":
+            assessor_label["page"],
+
+        "label_rect":
+            assessor_rect,
 
         "write_position": {
-            "x": round(
-                assessor_rect["x0"] + 4,
-                2
-            ),
-            "y": service_write_y
+            "x":
+                assessor_write_x,
+
+            "y":
+                assessor_write_y
         },
 
-        "value_rect": {
-            "x0": round(
-                assessor_rect["x0"],
-                2
-            ),
-            "y0": round(
-                service_write_y
-                - float(assessor_font["size"])
-                - 2,
-                2
-            ),
-            "x1": assessor_right,
-            "y1": round(
-                service_write_y + 2,
-                2
-            )
-        },
+        "value_rect":
+            assessor_value_rect,
 
-        "font": assessor_font
+        "safe_clear_rect":
+            make_text_band(
+                x0=assessor_cell_x0,
+                x1=assessor_cell_x1,
+                baseline_y=assessor_write_y,
+                font_size=assessor_font_size,
+                left_inset=2,
+                right_inset=2
+            ),
+
+        "font":
+            assessor_font
     }
 
 
     #
     # Totals
-    #
-    # The existing numeric value beside each label is
-    # extracted and used for its exact position.
     #
 
     for field_name in [
@@ -481,44 +612,27 @@ def build_fields(
             field_name
         ]
 
-        original_value = find_inline_value(
-            metadata,
-            label
+        original_value = (
+            find_inline_value(
+                metadata,
+                label
+            )
         )
 
         if original_value:
 
-            value_rect = {
-                "x0": round(
-                    original_value["rect"]["x0"],
-                    2
-                ),
-                "y0": round(
-                    original_value["rect"]["y0"],
-                    2
-                ),
-                "x1": round(
-                    original_value["rect"]["x1"],
-                    2
-                ),
-                "y1": round(
-                    original_value["rect"]["y1"],
-                    2
-                )
-            }
+            original_rect = (
+                original_value["rect"]
+            )
 
             write_position = {
                 "x": round(
-                    original_value
-                    ["rect"]
-                    ["x0"],
+                    original_rect["x0"],
                     2
                 ),
 
                 "y": round(
-                    original_value
-                    ["rect"]
-                    ["y1"],
+                    original_rect["y1"],
                     2
                 )
             }
@@ -530,6 +644,18 @@ def build_fields(
                 )
             )
 
+            value_rect = (
+                exact_safe_rect(
+                    original_rect
+                )
+            )
+
+            safe_clear_rect = (
+                exact_safe_rect(
+                    original_rect
+                )
+            )
+
         else:
 
             label_rect = (
@@ -538,6 +664,10 @@ def build_fields(
 
             value_font = (
                 label["font"]
+            )
+
+            font_size = float(
+                value_font["size"]
             )
 
             write_x = round(
@@ -566,9 +696,7 @@ def build_fields(
 
                 "y0": round(
                     write_y
-                    - float(
-                        value_font["size"]
-                    )
+                    - font_size
                     - 2,
                     2
                 ),
@@ -584,28 +712,16 @@ def build_fields(
                 )
             }
 
-
-        #
-        # Slight vertical adjustment requested for
-        # the Invoice Total row.
-        #
-
-        # if field_name == "Invoice Total":
-
-        #     write_position["y"] = round(
-        #         write_position["y"] - 1,
-        #         2
-        #     )
-
-        #     value_rect["y0"] = round(
-        #         value_rect["y0"] - 1,
-        #         2
-        #     )
-
-        #     value_rect["y1"] = round(
-        #         value_rect["y1"] - 1,
-        #         2
-        #     )
+            safe_clear_rect = (
+                make_text_band(
+                    x0=value_rect["x0"],
+                    x1=value_rect["x1"],
+                    baseline_y=write_y,
+                    font_size=font_size,
+                    left_inset=1,
+                    right_inset=1
+                )
+            )
 
 
         output["fields"][field_name] = {
@@ -623,6 +739,9 @@ def build_fields(
 
             "value_rect":
                 value_rect,
+
+            "safe_clear_rect":
+                safe_clear_rect,
 
             "font":
                 value_font
