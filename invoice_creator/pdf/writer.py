@@ -3,11 +3,33 @@ from pathlib import Path
 
 import fitz
 
-from invoice_creator.pdf.table_writer import write_lines
-from invoice_creator.pdf.text_writer import write_in_area
+from invoice_creator.pdf.table_writer import (
+    write_lines
+)
+
+from invoice_creator.pdf.text_writer import (
+    write_value
+)
 
 
 class InvoicePDFWriter:
+
+    REQUIRED_FIELDS = {
+        "Invoice No",
+        "Service User",
+        "Assessor",
+        "Net Amount",
+        "VAT",
+        "Invoice Total"
+    }
+
+    REQUIRED_COLUMNS = {
+        "description",
+        "units",
+        "rate",
+        "net"
+    }
+
 
     def __init__(
         self,
@@ -15,21 +37,111 @@ class InvoicePDFWriter:
         fields_path,
         table_path
     ):
-        self.template_path = template_path
+
+        self.template_path = Path(
+            template_path
+        )
+
+        self.fields_path = Path(
+            fields_path
+        )
+
+        self.table_path = Path(
+            table_path
+        )
+
+        self.fields = self._load_json(
+            self.fields_path
+        )
+
+        self.table = self._load_json(
+            self.table_path
+        )
+
+        self._validate_metadata()
+
+
+    @staticmethod
+    def _load_json(
+        path: Path
+    ) -> dict:
+
+        if not path.exists():
+
+            raise FileNotFoundError(
+                f"Metadata file does not exist: "
+                f"{path}"
+            )
 
         with open(
-            fields_path,
+            path,
             "r",
             encoding="utf-8"
         ) as file:
-            self.fields = json.load(file)
 
-        with open(
-            table_path,
-            "r",
-            encoding="utf-8"
-        ) as file:
-            self.table = json.load(file)
+            return json.load(
+                file
+            )
+
+
+    def _validate_metadata(
+        self
+    ) -> None:
+
+        available_fields = set(
+            self.fields
+            .get(
+                "fields",
+                {}
+            )
+            .keys()
+        )
+
+        missing_fields = (
+            self.REQUIRED_FIELDS
+            - available_fields
+        )
+
+        if missing_fields:
+
+            raise ValueError(
+                "Missing template field metadata: "
+                + ", ".join(
+                    sorted(
+                        missing_fields
+                    )
+                )
+            )
+
+
+        available_columns = set(
+            self.table
+            .get(
+                "invoice_lines",
+                {}
+            )
+            .get(
+                "columns",
+                {}
+            )
+            .keys()
+        )
+
+        missing_columns = (
+            self.REQUIRED_COLUMNS
+            - available_columns
+        )
+
+        if missing_columns:
+
+            raise ValueError(
+                "Missing table metadata: "
+                + ", ".join(
+                    sorted(
+                        missing_columns
+                    )
+                )
+            )
 
 
     def generate(
@@ -38,18 +150,29 @@ class InvoicePDFWriter:
         output_path
     ) -> None:
 
-        output_path = Path(output_path)
+        output_path = Path(
+            output_path
+        )
 
         output_path.parent.mkdir(
             parents=True,
             exist_ok=True
         )
 
+        if not self.template_path.exists():
+
+            raise FileNotFoundError(
+                f"Blank PDF template does not exist: "
+                f"{self.template_path}"
+            )
+
+
         document = fitz.open(
             self.template_path
         )
 
         try:
+
             page = document[0]
 
             self.write_invoice_fields(
@@ -70,6 +193,7 @@ class InvoicePDFWriter:
             )
 
         finally:
+
             document.close()
 
 
@@ -79,62 +203,95 @@ class InvoicePDFWriter:
         invoice
     ) -> None:
 
-        fields = self.fields["fields"]
+        fields = self.fields[
+            "fields"
+        ]
 
-        values = {
-            "Invoice No":
-                invoice.invoice_no,
 
-            "Service User":
-                invoice.service_user,
+        write_value(
+            page=page,
+            value=invoice.invoice_no,
+            metadata=fields["Invoice No"]
+        )
 
-            "Assessor":
-                invoice.assessor,
 
-            "Net Amount":
-                f"{float(invoice.net_amount):.2f}",
+        write_value(
+            page=page,
+            value=invoice.service_user,
+            metadata=fields["Service User"]
+        )
 
-            "VAT":
-                f"{float(invoice.vat):.2f}",
 
-            "Invoice Total":
-                f"{float(invoice.invoice_total):.2f}"
-        }
+        write_value(
+            page=page,
+            value=invoice.assessor,
+            metadata=fields["Assessor"]
+        )
+
+
+        #
+        # Totals use the Net column's horizontal boundaries.
+        #
+
+        net_box = (
+            self.table
+            ["invoice_lines"]
+            ["columns"]
+            ["net"]
+            ["box"]
+        )
+
 
         totals = {
-            "Net Amount",
-            "VAT",
-            "Invoice Total"
+            "Net Amount":
+                self._format_money(
+                    invoice.net_amount
+                ),
+
+            "VAT":
+                self._format_money(
+                    invoice.vat
+                ),
+
+            "Invoice Total":
+                self._format_money(
+                    invoice.invoice_total
+                )
         }
 
-        for field_name, value in values.items():
 
-            if field_name not in fields:
-                raise KeyError(
-                    f"Missing PDF field metadata: "
-                    f"{field_name}"
-                )
+        for field_name, value in (
+            totals.items()
+        ):
 
-            metadata = fields[field_name]
-
-            is_total = (
-                field_name in totals
+            metadata = dict(
+                fields[field_name]
             )
 
-            write_in_area(
+            metadata["box"] = {
+                "x0":
+                    net_box["x0"],
+
+                "x1":
+                    net_box["x1"]
+            }
+
+            metadata["align"] = (
+                "right"
+            )
+
+            write_value(
                 page=page,
                 value=value,
-                value_rect=metadata["value_rect"],
-                write_position=metadata["write_position"],
-                font=metadata["font"],
-                align=(
-                    "right"
-                    if is_total
-                    else "left"
-                ),
-                padding=(
-                    3
-                    if is_total
-                    else 0
-                )
+                metadata=metadata,
+                align="right",
+                padding=1
             )
+
+
+    @staticmethod
+    def _format_money(
+        value
+    ) -> str:
+
+        return f"{float(value):.2f}"
