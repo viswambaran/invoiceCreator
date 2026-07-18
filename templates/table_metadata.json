@@ -1,0 +1,142 @@
+{
+    "invoice_lines": {
+        "page": 1,
+        "columns": {
+            "description": {
+                "header_position": {
+                    "x": 322.45,
+                    "y": 329.99
+                },
+                "write_position": {
+                    "x": 304.36,
+                    "y": 360.73,
+                    "align": "left"
+                },
+                "value_rect": {
+                    "x0": 301.36,
+                    "y0": 348.44,
+                    "x1": 372.63,
+                    "y1": 361.73
+                },
+                "column_width": 71.27,
+                "font": {
+                    "name": "ArialMT",
+                    "size": 8.27,
+                    "colour": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                    },
+                    "style": {
+                        "bold": false,
+                        "italic": false,
+                        "serif": false,
+                        "monospace": false
+                    }
+                }
+            },
+            "units": {
+                "header_position": {
+                    "x": 409.63,
+                    "y": 329.99
+                },
+                "write_position": {
+                    "x": 412.37,
+                    "y": 360.73,
+                    "align": "right"
+                },
+                "value_rect": {
+                    "x0": 409.37,
+                    "y0": 348.44,
+                    "x1": 433.76,
+                    "y1": 361.73
+                },
+                "column_width": 24.39,
+                "font": {
+                    "name": "ArialMT",
+                    "size": 8.27,
+                    "colour": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                    },
+                    "style": {
+                        "bold": false,
+                        "italic": false,
+                        "serif": false,
+                        "monospace": false
+                    }
+                }
+            },
+            "rate": {
+                "header_position": {
+                    "x": 460.82,
+                    "y": 329.99
+                },
+                "write_position": {
+                    "x": 448.36,
+                    "y": 360.73,
+                    "align": "right"
+                },
+                "value_rect": {
+                    "x0": 445.36,
+                    "y0": 348.44,
+                    "x1": 483.55,
+                    "y1": 361.73
+                },
+                "column_width": 38.19,
+                "font": {
+                    "name": "ArialMT",
+                    "size": 8.27,
+                    "colour": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                    },
+                    "style": {
+                        "bold": false,
+                        "italic": false,
+                        "serif": false,
+                        "monospace": false
+                    }
+                }
+            },
+            "net": {
+                "header_position": {
+                    "x": 512.97,
+                    "y": 329.99
+                },
+                "write_position": {
+                    "x": 520.36,
+                    "y": 360.73,
+                    "align": "right"
+                },
+                "value_rect": {
+                    "x0": 517.36,
+                    "y0": 348.44,
+                    "x1": 548.65,
+                    "y1": 361.73
+                },
+                "column_width": 31.29,
+                "font": {
+                    "name": "ArialMT",
+                    "size": 8.27,
+                    "colour": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                    },
+                    "style": {
+                        "bold": false,
+                        "italic": false,
+                        "serif": false,
+                        "monospace": false
+                    }
+                }
+            }
+        },
+        "first_row_y": 356.99,
+        "row_height": 20,
+        "max_rows": 5
+    }
+}

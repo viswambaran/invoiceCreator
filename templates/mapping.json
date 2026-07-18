@@ -1,0 +1,32 @@
+{
+    "invoice": {
+
+        "invoice_no": {
+            "type": "column",
+            "value": "Invoice No"
+        },
+
+        "service_user": {
+            "type": "column",
+            "value": "Client Name"
+        },
+
+        "assessor": {
+            "type": "column",
+            "value": "Assessor"
+        }
+
+    },
+
+
+    "invoice_lines": {
+
+        "units": {
+
+            "type": "constant",
+            "value": 1
+
+        }
+
+    }
+}

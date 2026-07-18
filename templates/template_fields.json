@@ -1,0 +1,216 @@
+{
+    "template_name": "Invoice Template",
+    "pages": 1,
+    "fields": {
+        "Invoice No": {
+            "pdf_label": "Invoice No : ",
+            "page": 1,
+            "label_rect": {
+                "x0": 401.86,
+                "y0": 264.93,
+                "x1": 451.03,
+                "y1": 273.2
+            },
+            "write_position": {
+                "x": 472.03,
+                "y": 273.2
+            },
+            "value_rect": {
+                "x0": 470.03,
+                "y0": 262.93,
+                "x1": 550.03,
+                "y1": 275.2
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "Service User": {
+            "pdf_label": "Service User",
+            "page": 1,
+            "label_rect": {
+                "x0": 52.36,
+                "y0": 321.16,
+                "x1": 102.47,
+                "y1": 333.0
+            },
+            "write_position": {
+                "x": 54.36,
+                "y": 354.0
+            },
+            "value_rect": {
+                "x0": 53.36,
+                "y0": 343.73,
+                "x1": 230.36,
+                "y1": 356.0
+            },
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "Assessor": {
+            "pdf_label": "BIA/DR",
+            "page": 1,
+            "label_rect": {
+                "x0": 232.36,
+                "y0": 321.16,
+                "x1": 260.85,
+                "y1": 333.0
+            },
+            "write_position": {
+                "x": 234.36,
+                "y": 354.0
+            },
+            "value_rect": {
+                "x0": 233.36,
+                "y0": 343.73,
+                "x1": 320.45,
+                "y1": 356.0
+            },
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "Net Amount": {
+            "pdf_label": "Net Amount",
+            "page": 1,
+            "label_rect": {
+                "x0": 373.16,
+                "y0": 548.86,
+                "x1": 420.02,
+                "y1": 557.13
+            },
+            "write_position": {
+                "x": 521.18,
+                "y": 559.4
+            },
+            "value_rect": {
+                "x0": 519.18,
+                "y0": 547.11,
+                "x1": 548.47,
+                "y1": 560.4
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "VAT": {
+            "pdf_label": "Total Vat @ 20.00%",
+            "page": 1,
+            "label_rect": {
+                "x0": 373.16,
+                "y0": 560.36,
+                "x1": 448.79,
+                "y1": 568.63
+            },
+            "write_position": {
+                "x": 525.78,
+                "y": 570.98
+            },
+            "value_rect": {
+                "x0": 523.78,
+                "y0": 558.69,
+                "x1": 548.47,
+                "y1": 571.98
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "Invoice Total": {
+            "pdf_label": "Invoice Total",
+            "page": 1,
+            "label_rect": {
+                "x0": 373.16,
+                "y0": 571.86,
+                "x1": 423.71,
+                "y1": 580.13
+            },
+            "write_position": {
+                "x": 521.18,
+                "y": 581.55
+            },
+            "value_rect": {
+                "x0": 519.18,
+                "y0": 569.27,
+                "x1": 548.47,
+                "y1": 582.55
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        }
+    }
+}

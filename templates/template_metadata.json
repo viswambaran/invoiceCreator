@@ -1,0 +1,1557 @@
+{
+    "template_name": "Invoice Template",
+    "created": "2026-07-16T16:59:54.419738",
+    "pages": 1,
+    "fields": [
+        {
+            "page": 1,
+            "text": "INVOICE",
+            "rect": {
+                "x0": 272.69,
+                "y0": 93.2,
+                "x1": 334.29,
+                "y1": 108.18
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 14.98,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Joanne Danby",
+            "rect": {
+                "x0": 78.94,
+                "y0": 138.42,
+                "x1": 132.26,
+                "y1": 146.69
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Dawson House",
+            "rect": {
+                "x0": 401.86,
+                "y0": 181.55,
+                "x1": 457.93,
+                "y1": 189.82
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Durham Social Services",
+            "rect": {
+                "x0": 78.94,
+                "y0": 149.92,
+                "x1": 167.17,
+                "y1": 158.19
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "5 Jewry Street",
+            "rect": {
+                "x0": 401.86,
+                "y0": 193.05,
+                "x1": 454.71,
+                "y1": 201.32
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Adult & Health Services",
+            "rect": {
+                "x0": 78.94,
+                "y0": 161.42,
+                "x1": 165.81,
+                "y1": 169.69
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "London",
+            "rect": {
+                "x0": 401.86,
+                "y0": 204.55,
+                "x1": 429.45,
+                "y1": 212.82
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Adult Protection & DoLS Team",
+            "rect": {
+                "x0": 78.94,
+                "y0": 172.92,
+                "x1": 191.55,
+                "y1": 181.19
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "EC3N 2EX",
+            "rect": {
+                "x0": 401.86,
+                "y0": 216.05,
+                "x1": 441.85,
+                "y1": 224.32
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Durham County Council",
+            "rect": {
+                "x0": 78.94,
+                "y0": 184.43,
+                "x1": 166.72,
+                "y1": 192.7
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Tel: 0207 625 5222",
+            "rect": {
+                "x0": 401.86,
+                "y0": 227.55,
+                "x1": 473.12,
+                "y1": 235.82
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Room 2/37",
+            "rect": {
+                "x0": 78.94,
+                "y0": 195.93,
+                "x1": 119.39,
+                "y1": 204.2
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "County Hall",
+            "rect": {
+                "x0": 78.94,
+                "y0": 207.43,
+                "x1": 121.68,
+                "y1": 215.7
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Durham",
+            "rect": {
+                "x0": 78.94,
+                "y0": 218.93,
+                "x1": 108.35,
+                "y1": 227.2
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "DH1 5UL",
+            "rect": {
+                "x0": 78.94,
+                "y0": 230.43,
+                "x1": 112.95,
+                "y1": 238.7
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Account : ",
+            "rect": {
+                "x0": 401.86,
+                "y0": 253.43,
+                "x1": 442.29,
+                "y1": 261.7
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Comments: ",
+            "rect": {
+                "x0": 46.64,
+                "y0": 257.02,
+                "x1": 94.42,
+                "y1": 265.29
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "DURH00",
+            "rect": {
+                "x0": 473.62,
+                "y0": 253.43,
+                "x1": 506.7,
+                "y1": 261.7
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Invoice No : ",
+            "rect": {
+                "x0": 401.86,
+                "y0": 264.93,
+                "x1": 451.03,
+                "y1": 273.2
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "8",
+            "rect": {
+                "x0": 475.2,
+                "y0": 262.37,
+                "x1": 479.8,
+                "y1": 273.65
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Invoice Date : ",
+            "rect": {
+                "x0": 401.86,
+                "y0": 276.43,
+                "x1": 457.93,
+                "y1": 284.7
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": ".2026",
+            "rect": {
+                "x0": 474.55,
+                "y0": 276.02,
+                "x1": 495.24,
+                "y1": 284.29
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Page No : ",
+            "rect": {
+                "x0": 401.86,
+                "y0": 287.93,
+                "x1": 442.3,
+                "y1": 296.2
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "1",
+            "rect": {
+                "x0": 473.62,
+                "y0": 287.93,
+                "x1": 478.22,
+                "y1": 296.2
+            },
+            "font": {
+                "name": "Arial",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Charge Desc.",
+            "rect": {
+                "x0": 322.45,
+                "y0": 321.72,
+                "x1": 375.3,
+                "y1": 329.99
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Units",
+            "rect": {
+                "x0": 409.63,
+                "y0": 321.72,
+                "x1": 430.31,
+                "y1": 329.99
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Rate",
+            "rect": {
+                "x0": 460.82,
+                "y0": 321.72,
+                "x1": 478.74,
+                "y1": 329.99
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Net",
+            "rect": {
+                "x0": 512.97,
+                "y0": 321.72,
+                "x1": 526.29,
+                "y1": 329.99
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "The debt arising under this invoice has been absolutely assigned to Skipton Business ",
+            "rect": {
+                "x0": 47.61,
+                "y0": 549.43,
+                "x1": 323.92,
+                "y1": 556.14
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Finance Limited of The Bailey, Skipton, North Yorkshire, BD23 1DN and they alone are ",
+            "rect": {
+                "x0": 47.61,
+                "y0": 557.45,
+                "x1": 323.92,
+                "y1": 564.16
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "entitled to receive payment.  Please quote our name as your supplier when sending ",
+            "rect": {
+                "x0": 47.61,
+                "y0": 565.48,
+                "x1": 315.35,
+                "y1": 572.19
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "payment to them.  If paying by credit transfer quote Barclays Bank plc, Skipton \u2013 Sort ",
+            "rect": {
+                "x0": 47.61,
+                "y0": 573.51,
+                "x1": 322.05,
+                "y1": 580.22
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Code: 20-78-91 Account No: 83785181.  If there is a dispute on this invoice you must notify ",
+            "rect": {
+                "x0": 47.61,
+                "y0": 581.53,
+                "x1": 338.09,
+                "y1": 588.24
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Skipton Business Finance Limited within 5 working days.",
+            "rect": {
+                "x0": 47.61,
+                "y0": 589.56,
+                "x1": 230.33,
+                "y1": 596.27
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Registered Office: The Bailey, Skipton, North Yorkshire, BD23 1DN",
+            "rect": {
+                "x0": 47.61,
+                "y0": 605.61,
+                "x1": 259.78,
+                "y1": 612.32
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Registered in England: Number 4171724",
+            "rect": {
+                "x0": 47.61,
+                "y0": 613.64,
+                "x1": 175.89,
+                "y1": 620.35
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Net Amount",
+            "rect": {
+                "x0": 373.16,
+                "y0": 548.86,
+                "x1": 420.02,
+                "y1": 557.13
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Total Vat @ 20.00%",
+            "rect": {
+                "x0": 373.16,
+                "y0": 560.36,
+                "x1": 448.79,
+                "y1": 568.63
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Invoice Total",
+            "rect": {
+                "x0": 373.16,
+                "y0": 571.86,
+                "x1": 423.71,
+                "y1": 580.13
+            },
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Action First Assessments LTD, Dawson House, 5 Jewry Street, London, EC3N 2EX",
+            "rect": {
+                "x0": 189.69,
+                "y0": 660.04,
+                "x1": 437.68,
+                "y1": 666.75
+            },
+            "font": {
+                "name": "Arial",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Tel: 0207 625 5222",
+            "rect": {
+                "x0": 284.65,
+                "y0": 668.07,
+                "x1": 342.47,
+                "y1": 674.78
+            },
+            "font": {
+                "name": "Arial",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Fax: ",
+            "rect": {
+                "x0": 306.0,
+                "y0": 676.1,
+                "x1": 320.92,
+                "y1": 682.81
+            },
+            "font": {
+                "name": "Arial",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Email: ",
+            "rect": {
+                "x0": 303.31,
+                "y0": 684.12,
+                "x1": 323.82,
+                "y1": 690.83
+            },
+            "font": {
+                "name": "Arial",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Company Reg No: 11643687",
+            "rect": {
+                "x0": 270.3,
+                "y0": 692.15,
+                "x1": 357.2,
+                "y1": 698.86
+            },
+            "font": {
+                "name": "Arial",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Vat Number: 313 3396 24",
+            "rect": {
+                "x0": 275.0,
+                "y0": 700.18,
+                "x1": 351.84,
+                "y1": 706.89
+            },
+            "font": {
+                "name": "Arial",
+                "size": 6.71,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Service User",
+            "rect": {
+                "x0": 52.36,
+                "y0": 321.16,
+                "x1": 102.47,
+                "y1": 333.0
+            },
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": " ",
+            "rect": {
+                "x0": 102.48,
+                "y0": 321.29,
+                "x1": 104.78,
+                "y1": 332.58
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "BIA/DR",
+            "rect": {
+                "x0": 232.36,
+                "y0": 321.16,
+                "x1": 260.85,
+                "y1": 333.0
+            },
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": " ",
+            "rect": {
+                "x0": 303.05,
+                "y0": 370.46,
+                "x1": 305.35,
+                "y1": 382.3
+            },
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "Authorisation ",
+            "rect": {
+                "x0": 305.35,
+                "y0": 370.59,
+                "x1": 355.92,
+                "y1": 381.88
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": " 1.00 ",
+            "rect": {
+                "x0": 411.06,
+                "y0": 370.59,
+                "x1": 431.75,
+                "y1": 381.88
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "     50.00 ",
+            "rect": {
+                "x0": 447.06,
+                "y0": 370.59,
+                "x1": 481.54,
+                "y1": 381.88
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "   50.00",
+            "rect": {
+                "x0": 519.06,
+                "y0": 370.59,
+                "x1": 546.65,
+                "y1": 381.88
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": " ",
+            "rect": {
+                "x0": 546.65,
+                "y0": 370.46,
+                "x1": 548.95,
+                "y1": 382.3
+            },
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "BIA Assessment  ",
+            "rect": {
+                "x0": 304.36,
+                "y0": 349.44,
+                "x1": 369.63,
+                "y1": 360.73
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "1.00 ",
+            "rect": {
+                "x0": 412.37,
+                "y0": 349.44,
+                "x1": 430.76,
+                "y1": 360.73
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "  300.00 ",
+            "rect": {
+                "x0": 448.36,
+                "y0": 349.44,
+                "x1": 480.55,
+                "y1": 360.73
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "300.00",
+            "rect": {
+                "x0": 520.36,
+                "y0": 349.44,
+                "x1": 545.65,
+                "y1": 360.73
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "350.00",
+            "rect": {
+                "x0": 521.18,
+                "y0": 548.11,
+                "x1": 546.47,
+                "y1": 559.4
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "70.00",
+            "rect": {
+                "x0": 525.78,
+                "y0": 559.69,
+                "x1": 546.47,
+                "y1": 570.98
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "420.00",
+            "rect": {
+                "x0": 521.18,
+                "y0": 571.27,
+                "x1": 546.47,
+                "y1": 582.55
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        {
+            "page": 1,
+            "text": "PO ",
+            "rect": {
+                "x0": 62.84,
+                "y0": 276.78,
+                "x1": 77.09,
+                "y1": 288.07
+            },
+            "font": {
+                "name": "ArialMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": false,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        }
+    ]
+}

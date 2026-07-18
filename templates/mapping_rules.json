@@ -1,0 +1,20 @@
+{
+    "invoice_lines": {
+
+        "charge_types": [
+
+            {
+                "source_column": "Charge",
+                "description": "BIA Assessment"
+            },
+
+
+            {
+                "source_column": "QA Charge",
+                "description": "Authorisation"
+            }
+
+        ]
+
+    }
+}
