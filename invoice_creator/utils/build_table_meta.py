@@ -99,13 +99,13 @@ def find_header(
 
     for item in metadata["fields"]:
 
-        text = clean_text(
+        item_text = clean_text(
             item["text"]
         ).lower()
 
         for alias in aliases:
 
-            if text == alias.lower():
+            if item_text == alias.lower():
 
                 return item
 
@@ -113,21 +113,23 @@ def find_header(
 
 
 def calculate_column_width(
-    headers: list[dict[str, Any]],
+    detected_headers: list[dict[str, Any]],
     index: int
 ) -> float:
 
     current_x = float(
-        headers[index]
+        detected_headers[index]
         ["data"]
         ["rect"]
         ["x0"]
     )
 
-    if index + 1 < len(headers):
+    if index + 1 < len(
+        detected_headers
+    ):
 
         next_x = float(
-            headers[index + 1]
+            detected_headers[index + 1]
             ["data"]
             ["rect"]
             ["x0"]
@@ -139,43 +141,6 @@ def calculate_column_width(
         )
 
     return 60.0
-
-
-def make_cell_text_band(
-    x0: float,
-    x1: float,
-    baseline_y: float,
-    font_size: float
-) -> dict[str, float]:
-    """
-    Narrow text-only area within a table cell.
-
-    The rectangle remains clear of cell borders.
-    """
-
-    return {
-        "x0": round(
-            x0 + 2,
-            2
-        ),
-
-        "y0": round(
-            baseline_y
-            - font_size
-            - 0.5,
-            2
-        ),
-
-        "x1": round(
-            x1 - 2,
-            2
-        ),
-
-        "y1": round(
-            baseline_y + 0.75,
-            2
-        )
-    }
 
 
 def build_table(
@@ -204,17 +169,26 @@ def build_table(
             aliases
         )
 
-        if header:
+        if header is None:
 
-            detected_headers.append(
-                {
-                    "name":
-                        column_name,
-
-                    "data":
-                        header
-                }
+            raise ValueError(
+                f"Missing table header: "
+                f"{column_name}"
             )
+
+        detected_headers.append(
+            {
+                "name":
+                    column_name,
+
+                "data":
+                    header
+            }
+        )
+
+        print(
+            f"✓ {column_name}"
+        )
 
             print(
                 f"✓ {column_name}"
@@ -253,9 +227,25 @@ def build_table(
         2
     )
 
-    table["invoice_lines"][
-        "first_row_y"
-    ] = first_row_y
+
+    table: dict[str, Any] = {
+        "invoice_lines": {
+            "page":
+                1,
+
+            "first_row_y":
+                first_row_y,
+
+            "row_height":
+                20,
+
+            "max_rows":
+                5,
+
+            "columns":
+                {}
+        }
+    }
 
 
     for index, item in enumerate(
@@ -270,90 +260,63 @@ def build_table(
             "data"
         ]
 
-        rect = header[
+        header_rect = header[
             "rect"
         ]
 
-        column_width = (
-            calculate_column_width(
-                detected_headers,
-                index
-            )
+        width = calculate_column_width(
+            detected_headers,
+            index
         )
 
-        x0 = float(
-            rect["x0"]
+        left_x = float(
+            header_rect["x0"]
         )
 
-        x1 = round(
-            x0 + column_width,
+        right_x = round(
+            left_x + width,
             2
         )
 
-        font = header[
-            "font"
+        alignment = COLUMN_ALIGNMENT[
+            column_name
         ]
-
-        font_size = float(
-            font["size"]
-        )
-
-        alignment = (
-            COLUMN_ALIGNMENT[
-                column_name
-            ]
-        )
-
-        write_x = (
-            round(
-                x0 + 4,
-                2
-            )
-            if alignment == "left"
-            else x0
-        )
-
-        cell_rect = {
-            "x0":
-                x0,
-
-            "y0": round(
-                first_row_y
-                - table["invoice_lines"]["row_height"],
-                2
-            ),
-
-            "x1":
-                x1,
-
-            "y1": round(
-                first_row_y + 3,
-                2
-            )
-        }
-
-        safe_clear_rect = (
-            make_cell_text_band(
-                x0=x0,
-                x1=x1,
-                baseline_y=first_row_y,
-                font_size=font_size
-            )
-        )
 
         table["invoice_lines"][
             "columns"
         ][column_name] = {
             "header_position": {
                 "x":
-                    rect["x0"],
+                    header_rect["x0"],
 
                 "y":
-                    rect["y1"]
+                    header_rect["y1"]
             },
 
-            "column_width":
-                column_width,
+            "box": {
+                "x0": round(
+                    left_x + 4,
+                    2
+                ),
+
+                "x1": round(
+                    right_x - 4,
+                    2
+                )
+            },
+
+            "write_position": {
+                "x": round(
+                    left_x + 4,
+                    2
+                ),
+
+                "y":
+                    first_row_y
+            },
+
+            "align":
+                alignment,
 
             "cell_rect":
                 cell_rect,
@@ -373,7 +336,7 @@ def build_table(
             },
 
             "font":
-                font
+                header["font"]
         }
 
 

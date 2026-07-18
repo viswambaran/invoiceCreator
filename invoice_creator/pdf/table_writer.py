@@ -1,4 +1,5 @@
 from invoice_creator.pdf.text_writer import (
+    write_value
     write_metadata_value,
 )
 
@@ -12,19 +13,27 @@ def format_table_value(
         "rate",
         "net",
     }:
+
         return f"{float(value):.2f}"
+
 
     if column_name == "units":
         numeric_value = float(value)
 
         if numeric_value.is_integer():
+
             return str(
-                int(numeric_value)
+                int(
+                    numeric_value
+                )
             )
 
         return str(numeric_value)
 
-    return str(value)
+
+    return str(
+        value
+    )
 
 
 def write_lines(
@@ -41,13 +50,15 @@ def write_lines(
         "columns"
     ]
 
+
     if len(invoice.lines) > table["max_rows"]:
         raise ValueError(
             f"Invoice {invoice.invoice_no} has "
-            f"{len(invoice.lines)} lines, but the "
-            f"template supports only "
+            f"{len(invoice.lines)} lines, but "
+            f"the template supports only "
             f"{table['max_rows']}."
         )
+
 
     for row_index, line in enumerate(
         invoice.lines
@@ -71,14 +82,18 @@ def write_lines(
                 line.net,
         }
 
+
         for column_name, value in values.items():
             if column_name not in columns:
+
                 continue
 
-            metadata = columns[
+
+            column_metadata = columns[
                 column_name
             ]
 
+            write_value(
             alignment = (
                 metadata["write_position"]
                 .get(
@@ -91,17 +106,28 @@ def write_lines(
                 page=page,
                 value=format_table_value(
                     column_name,
-                    value,
+                    value
                 ),
-                metadata=metadata,
-                align=alignment,
-                row_offset_y=row_offset_y,
+
+                metadata=
+                    column_metadata,
+
+                align=
+                    column_metadata.get(
+                        "align",
+                        "left"
+                    ),
+
+                row_offset_y=
+                    row_offset_y,
+
                 padding=(
-                    4
-                    if alignment == "right"
+                    1
+                    if column_name in {
+                        "units",
+                        "rate",
+                        "net"
+                    }
                     else 0
-                ),
-                clear_padding_x=2.0,
-                clear_padding_top=1.0,
-                clear_padding_bottom=0.75,
+                )
             )

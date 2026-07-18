@@ -1,15 +1,14 @@
 from typing import Any
 
+from typing import Any
+
 import fitz
 
 
 def get_pdf_font_name(
     font: dict[str, Any]
+    font: dict[str, Any]
 ) -> str:
-    """
-    Regular Helvetica currently matches the original value text
-    more closely than applying the extracted bold flag.
-    """
 
     return "helv"
 
@@ -18,80 +17,84 @@ def get_colour(
     font: dict[str, Any]
 ) -> tuple[float, float, float]:
 
-    colour = font["colour"]
+    colour = font[
+        "colour"
+    ]
 
     return (
         colour["r"] / 255,
         colour["g"] / 255,
-        colour["b"] / 255,
+        colour["b"] / 255
     )
 
 
-def get_horizontal_bounds(
-    metadata: dict[str, Any],
-    row_offset_y: float = 0,
-) -> tuple[float, float]:
+def fit_font_size(
+    text: str,
+    font_name: str,
+    preferred_size: float,
+    available_width: float,
+    minimum_size: float = 6.0
+) -> float:
     """
-    Return the usable horizontal boundaries for a field.
-
-    Table fields use cell_rect.
-    Fixed fields use value_rect.
+    Reduce the font only when a value cannot fit in its box.
     """
 
-    bounds = (
-        metadata.get("cell_rect")
-        or metadata.get("value_rect")
-    )
+    font_size = preferred_size
 
-    if bounds is None:
-        raise KeyError(
-            "PDF metadata must contain either "
-            "'cell_rect' or 'value_rect'."
+    while font_size > minimum_size:
+
+        text_width = fitz.get_text_length(
+            text,
+            fontname=font_name,
+            fontsize=font_size
         )
 
-    return (
-        float(bounds["x0"]),
-        float(bounds["x1"]),
-    )
+        if text_width <= available_width:
+
+            return font_size
+
+        font_size = round(
+            font_size - 0.25,
+            2
+        )
+
+    return minimum_size
 
 
-def write_metadata_value(
+def write_value(
     page,
     value,
     metadata: dict[str, Any],
-    align: str = "left",
+    align: str | None = None,
     row_offset_y: float = 0,
-    padding: float = 0,
-    clear_padding_x: float = 1.25,
-    clear_padding_top: float = 1.0,
-    clear_padding_bottom: float = 0.75,
+    padding: float = 0
 ) -> None:
     """
-    Clear only the glyph-sized region occupied by the replacement
-    text, then write the replacement.
+    Insert text into a blank template.
 
-    Metadata controls placement and cell boundaries. The whiteout
-    rectangle is calculated from the actual rendered text width,
-    so it does not span the full cell or touch its borders.
+    No masking, redaction, or white rectangle is drawn.
     """
 
     required_keys = {
         "write_position",
-        "font",
+        "box",
+        "font"
     }
 
-    missing_keys = (
+    missing = (
         required_keys
         - metadata.keys()
     )
 
-    if missing_keys:
+    if missing:
+
         raise KeyError(
             "Incomplete PDF metadata. Missing: "
             + ", ".join(
-                sorted(missing_keys)
+                sorted(missing)
             )
         )
+
 
     text = (
         ""
@@ -99,130 +102,109 @@ def write_metadata_value(
         else str(value)
     )
 
-    font = metadata["font"]
-    font_size = float(font["size"])
-    font_name = get_pdf_font_name(font)
+    font = metadata[
+        "font"
+    ]
 
-    left_bound, right_bound = get_horizontal_bounds(
-        metadata,
-        row_offset_y=row_offset_y,
+    font_name = get_pdf_font_name(
+        font
     )
 
-    write_position = metadata["write_position"]
+    box = metadata[
+        "box"
+    ]
 
-    baseline_y = (
-        float(write_position["y"])
-        + row_offset_y
+    left_x = float(
+        box["x0"]
+    )
+
+    right_x = float(
+        box["x1"]
+    )
+
+    available_width = max(
+        right_x
+        - left_x
+        - (padding * 2),
+        1
+    )
+
+    preferred_size = float(
+        font["size"]
+    )
+
+    font_size = fit_font_size(
+        text=text,
+        font_name=font_name,
+        preferred_size=preferred_size,
+        available_width=available_width
     )
 
     text_width = fitz.get_text_length(
         text,
         fontname=font_name,
-        fontsize=font_size,
+        fontsize=font_size
     )
 
-    if align == "right":
+    resolved_alignment = (
+        align
+        or metadata.get(
+            "align",
+            "left"
+        )
+    )
+
+    if resolved_alignment == "right":
+
         write_x = (
-            right_bound
+            right_x
             - padding
             - text_width
         )
 
-    elif align == "center":
-        available_width = (
-            right_bound
-            - left_bound
-        )
+    elif resolved_alignment == "center":
 
         write_x = (
-            left_bound
+            left_x
             + (
                 available_width
                 - text_width
             ) / 2
-        )
-
-    else:
-        write_x = (
-            float(write_position["x"])
             + padding
         )
 
-    #
-    # Keep the rendered text inside its metadata-defined cell.
-    #
+    else:
 
-    write_x = max(
-        write_x,
-        left_bound + 0.5,
-    )
-
-    maximum_write_x = (
-        right_bound
-        - text_width
-        - 0.5
-    )
-
-    write_x = min(
-        write_x,
-        maximum_write_x,
-    )
-
-    #
-    # Clear only the glyph band.
-    #
-    # This avoids painting across table borders or totals-row lines.
-    #
-
-    clear_x0 = max(
-        left_bound + 0.35,
-        write_x - clear_padding_x,
-    )
-
-    clear_x1 = min(
-        right_bound - 0.35,
-        write_x
-        + text_width
-        + clear_padding_x,
-    )
-
-    clear_y0 = (
-        baseline_y
-        - font_size
-        - clear_padding_top
-    )
-
-    clear_y1 = (
-        baseline_y
-        + clear_padding_bottom
-    )
-
-    clear_rect = fitz.Rect(
-        clear_x0,
-        clear_y0,
-        clear_x1,
-        clear_y1,
-    )
-
-    if (
-        clear_rect.x1 > clear_rect.x0
-        and clear_rect.y1 > clear_rect.y0
-    ):
-        page.draw_rect(
-            clear_rect,
-            color=None,
-            fill=(1, 1, 1),
-            overlay=True,
+        write_x = (
+            float(
+                metadata
+                ["write_position"]
+                ["x"]
+            )
+            + padding
         )
+
+
+    baseline_y = (
+        float(
+            metadata
+            ["write_position"]
+            ["y"]
+        )
+        + row_offset_y
+    )
+
 
     page.insert_text(
         (
             write_x,
-            baseline_y,
+            baseline_y
         ),
         text,
         fontname=font_name,
         fontsize=font_size,
-        color=get_colour(font),
-        overlay=True,
+        color=get_colour(
+            font
+        ),
+        overlay=True
     )
