@@ -20,14 +20,14 @@ class InvoicePDFWriter:
         "Assessor",
         "Net Amount",
         "VAT",
-        "Invoice Total"
+        "Invoice Total",
     }
 
     REQUIRED_COLUMNS = {
         "description",
         "units",
         "rate",
-        "net"
+        "net",
     }
 
 
@@ -42,20 +42,16 @@ class InvoicePDFWriter:
             template_path
         )
 
-        self.fields_path = Path(
-            fields_path
-        )
-
-        self.table_path = Path(
-            table_path
-        )
-
         self.fields = self._load_json(
-            self.fields_path
+            Path(
+                fields_path
+            )
         )
 
         self.table = self._load_json(
-            self.table_path
+            Path(
+                table_path
+            )
         )
 
         self._validate_metadata()
@@ -105,14 +101,13 @@ class InvoicePDFWriter:
         if missing_fields:
 
             raise ValueError(
-                "Missing template field metadata: "
+                "Missing field metadata: "
                 + ", ".join(
                     sorted(
                         missing_fields
                     )
                 )
             )
-
 
         available_columns = set(
             self.table
@@ -159,14 +154,6 @@ class InvoicePDFWriter:
             exist_ok=True
         )
 
-        if not self.template_path.exists():
-
-            raise FileNotFoundError(
-                f"Blank PDF template does not exist: "
-                f"{self.template_path}"
-            )
-
-
         document = fitz.open(
             self.template_path
         )
@@ -211,34 +198,21 @@ class InvoicePDFWriter:
             page=page,
             value=invoice.invoice_no,
             metadata=fields["Invoice No"],
-            align="left"
+            padding=4
         )
 
         write_value(
             page=page,
             value=invoice.service_user,
             metadata=fields["Service User"],
-            align="left"
+            padding=7
         )
 
         write_value(
             page=page,
             value=invoice.assessor,
             metadata=fields["Assessor"],
-            align="left"
-        )
-
-        #
-        # Totals share the right edge of the main table,
-        # but need greater right padding than the table values.
-        #
-
-        net_box = (
-            self.table
-            ["invoice_lines"]
-            ["columns"]
-            ["net"]
-            ["box"]
+            padding=7
         )
 
         totals = {
@@ -255,41 +229,21 @@ class InvoicePDFWriter:
             "Invoice Total":
                 self._format_money(
                     invoice.invoice_total
-                )
+                ),
         }
 
-        for field_name, value in totals.items():
-
-            metadata = dict(
-                fields[field_name]
-            )
-
-            #
-            # Use a separate box object so the loaded
-            # metadata is not modified in memory.
-            #
-
-            metadata["box"] = {
-                "x0":
-                    net_box["x0"],
-
-                "x1":
-                    net_box["x1"]
-            }
-
-            metadata["align"] = "right"
+        for field_name, value in (
+            totals.items()
+        ):
 
             write_value(
                 page=page,
                 value=value,
-                metadata=metadata,
+                metadata=fields[field_name],
                 align="right",
-
-                #
-                # Move totals safely inside the box.
-                #
-                padding=7
+                padding=8
             )
+
 
     @staticmethod
     def _format_money(

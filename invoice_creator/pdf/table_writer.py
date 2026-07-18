@@ -10,19 +10,30 @@ def format_table_value(
 
     if column_name in {
         "rate",
-        "net"
+        "net",
     }:
+
         return f"{float(value):.2f}"
 
     if column_name == "units":
-        numeric_value = float(value)
+
+        numeric_value = float(
+            value
+        )
 
         if numeric_value.is_integer():
-            return str(int(numeric_value))
 
-        return str(numeric_value)
+            return str(
+                int(numeric_value)
+            )
 
-    return str(value)
+        return str(
+            numeric_value
+        )
+
+    return str(
+        value
+    )
 
 
 def write_lines(
@@ -40,6 +51,7 @@ def write_lines(
     ]
 
     if len(invoice.lines) > table["max_rows"]:
+
         raise ValueError(
             f"Invoice {invoice.invoice_no} has "
             f"{len(invoice.lines)} lines, but "
@@ -67,41 +79,16 @@ def write_lines(
                 line.rate,
 
             "net":
-                line.net
+                line.net,
         }
 
-        for column_name, value in values.items():
-
-            if column_name not in columns:
-                continue
+        for column_name, value in (
+            values.items()
+        ):
 
             column_metadata = columns[
                 column_name
             ]
-
-            #
-            # Each table column needs its own alignment
-            # and padding rather than one generic rule.
-            #
-
-            if column_name == "description":
-                alignment = "left"
-                padding = 3
-
-            elif column_name == "units":
-                alignment = "center"
-                padding = 0
-
-            elif column_name in {
-                "rate",
-                "net"
-            }:
-                alignment = "right"
-                padding = 6
-
-            else:
-                alignment = "left"
-                padding = 0
 
             write_value(
                 page=page,
@@ -115,11 +102,12 @@ def write_lines(
                     column_metadata,
 
                 align=
-                    alignment,
+                    column_metadata[
+                        "align"
+                    ],
 
                 row_offset_y=
                     row_offset_y,
 
-                padding=
-                    padding
+                padding=6
             )

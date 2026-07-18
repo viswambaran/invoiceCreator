@@ -7,6 +7,10 @@ INPUT_FILE = Path(
     "templates/template_metadata.json"
 )
 
+TABLE_FILE = Path(
+    "templates/table_metadata.json"
+)
+
 OUTPUT_FILE = Path(
     "templates/template_fields.json"
 )
@@ -14,31 +18,31 @@ OUTPUT_FILE = Path(
 
 FIELD_RULES = {
     "Invoice No": [
-        "Invoice No"
+        "Invoice No",
     ],
 
     "Service User": [
-        "Service User"
+        "Service User",
     ],
 
     "Assessor": [
         "BIA/DR",
-        "Assessor"
+        "Assessor",
     ],
 
     "Net Amount": [
-        "Net Amount"
+        "Net Amount",
     ],
 
     "VAT": [
         "Total Vat",
         "VAT",
-        "Vat"
+        "Vat",
     ],
 
     "Invoice Total": [
-        "Invoice Total"
-    ]
+        "Invoice Total",
+    ],
 }
 
 
@@ -98,13 +102,13 @@ def find_field(
 
     for item in metadata["fields"]:
 
-        item_text = clean_text(
+        text = clean_text(
             item["text"]
         ).lower()
 
         for alias in aliases:
 
-            if alias.lower() in item_text:
+            if alias.lower() in text:
 
                 return item
 
@@ -112,7 +116,8 @@ def find_field(
 
 
 def build_fields(
-    metadata: dict[str, Any]
+    metadata: dict[str, Any],
+    table_metadata: dict[str, Any]
 ) -> dict[str, Any]:
 
     detected: dict[
@@ -142,20 +147,6 @@ def build_fields(
             f"✓ {field_name}"
         )
 
-
-    invoice_label = detected[
-        "Invoice No"
-    ]
-
-    service_label = detected[
-        "Service User"
-    ]
-
-    assessor_label = detected[
-        "Assessor"
-    ]
-
-
     output: dict[str, Any] = {
         "template_name":
             metadata["template_name"],
@@ -163,13 +154,13 @@ def build_fields(
         "pages":
             metadata["pages"],
 
-        "fields": {}
+        "fields":
+            {},
     }
 
-
-    #
-    # Invoice No
-    #
+    invoice_label = detected[
+        "Invoice No"
+    ]
 
     invoice_rect = invoice_label[
         "rect"
@@ -182,6 +173,18 @@ def build_fields(
         "page":
             invoice_label["page"],
 
+        "cell": {
+            "x0": round(
+                invoice_rect["x1"] + 8,
+                2
+            ),
+
+            "x1": round(
+                invoice_rect["x1"] + 85,
+                2
+            ),
+        },
+
         "write_position": {
             "x": round(
                 invoice_rect["x1"] + 12,
@@ -191,165 +194,41 @@ def build_fields(
             "y": round(
                 invoice_rect["y1"],
                 2
-            )
-        },
-
-        "box": {
-            "x0": round(
-                invoice_rect["x1"] + 10,
-                2
             ),
-
-            "x1": round(
-                invoice_rect["x1"] + 80,
-                2
-            )
         },
 
         "align":
             "left",
 
         "font":
-            invoice_label["font"]
+            invoice_label["font"],
     }
 
-
-    #
-    # Service User
-    #
-
-    service_rect = service_label[
-        "rect"
+    header_cells = table_metadata[
+        "header_value_cells"
     ]
 
-    output["fields"]["Service User"] = {
-        "pdf_label":
-            service_label["text"],
-
-        "page":
-            service_label["page"],
-
-        "write_position": {
-            "x": round(
-                service_rect["x0"] + 4,
-                2
-            ),
-
-            "y": round(
-                service_rect["y1"] + 18,
-                2
-            )
-        },
-
-        "box": {
-            "x0": round(
-                service_rect["x0"] + 4,
-                2
-            ),
-
-            "x1": round(
-                assessor_label["rect"]["x0"] - 4,
-                2
-            )
-        },
-
-        "align":
-            "left",
-
-        "font":
-            service_label["font"]
-    }
-
-
-    #
-    # BIA/DR / Assessor
-    #
-
-    assessor_rect = assessor_label[
-        "rect"
+    first_row_y = table_metadata[
+        "invoice_lines"
+    ][
+        "first_row_y"
     ]
-
-    description_header = find_field(
-        metadata,
-        [
-            "Charge Desc",
-            "Charge Desc.",
-            "Charge Description",
-            "Description"
-        ]
-    )
-
-    if description_header is None:
-
-        assessor_right = round(
-            assessor_rect["x0"] + 170,
-            2
-        )
-
-    else:
-
-        assessor_right = round(
-            description_header["rect"]["x0"] - 4,
-            2
-        )
-
-
-    output["fields"]["Assessor"] = {
-        "pdf_label":
-            assessor_label["text"],
-
-        "page":
-            assessor_label["page"],
-
-        "write_position": {
-            "x": round(
-                assessor_rect["x0"] + 4,
-                2
-            ),
-
-            "y": round(
-                assessor_rect["y1"] + 18,
-                2
-            )
-        },
-
-        "box": {
-            "x0": round(
-                assessor_rect["x0"] + 4,
-                2
-            ),
-
-            "x1":
-                assessor_right
-        },
-
-        "align":
-            "left",
-
-        "font":
-            assessor_label["font"]
-    }
-
-
-    #
-    # Totals
-    #
-    # Their horizontal cell is supplied by table_metadata.json
-    # in writer.py. This metadata provides the exact baseline/font.
-    #
 
     for field_name in [
-        "Net Amount",
-        "VAT",
-        "Invoice Total"
+        "Service User",
+        "Assessor",
     ]:
 
         label = detected[
             field_name
         ]
 
-        label_rect = label[
-            "rect"
+        cell_metadata = header_cells[
+            field_name
+        ]
+
+        cell = cell_metadata[
+            "cell"
         ]
 
         output["fields"][field_name] = {
@@ -359,25 +238,78 @@ def build_fields(
             "page":
                 label["page"],
 
+            "cell": {
+                "x0":
+                    cell["x0"],
+
+                "x1":
+                    cell["x1"],
+            },
+
             "write_position": {
                 "x": round(
-                    label_rect["x1"] + 5,
+                    cell["x0"] + 7,
                     2
                 ),
 
+                "y":
+                    first_row_y,
+            },
+
+            "align":
+                "left",
+
+            "font":
+                label["font"],
+        }
+
+    total_value_cell = (
+        table_metadata
+        ["totals"]
+        ["value_cell"]
+    )
+
+    for field_name in [
+        "Net Amount",
+        "VAT",
+        "Invoice Total",
+    ]:
+
+        label = detected[
+            field_name
+        ]
+
+        output["fields"][field_name] = {
+            "pdf_label":
+                label["text"],
+
+            "page":
+                label["page"],
+
+            "cell": {
+                "x0":
+                    total_value_cell["x0"],
+
+                "x1":
+                    total_value_cell["x1"],
+            },
+
+            "write_position": {
+                "x":
+                    total_value_cell["x0"],
+
                 "y": round(
-                    label_rect["y1"],
+                    label["rect"]["y1"],
                     2
-                )
+                ),
             },
 
             "align":
                 "right",
 
             "font":
-                label["font"]
+                label["font"],
         }
-
 
     return output
 
@@ -388,8 +320,13 @@ if __name__ == "__main__":
         INPUT_FILE
     )
 
+    table_metadata = load_json(
+        TABLE_FILE
+    )
+
     fields = build_fields(
-        metadata
+        metadata,
+        table_metadata
     )
 
     save_json(

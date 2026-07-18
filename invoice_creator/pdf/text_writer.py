@@ -21,7 +21,7 @@ def get_colour(
     return (
         colour["r"] / 255,
         colour["g"] / 255,
-        colour["b"] / 255
+        colour["b"] / 255,
     )
 
 
@@ -32,22 +32,18 @@ def fit_font_size(
     available_width: float,
     minimum_size: float = 6.0
 ) -> float:
-    """
-    Reduce the font only when a value cannot fit in its box.
-    """
 
     font_size = preferred_size
 
     while font_size > minimum_size:
 
-        text_width = fitz.get_text_length(
+        width = fitz.get_text_length(
             text,
             fontname=font_name,
             fontsize=font_size
         )
 
-        if text_width <= available_width:
-
+        if width <= available_width:
             return font_size
 
         font_size = round(
@@ -64,22 +60,23 @@ def write_value(
     metadata: dict[str, Any],
     align: str | None = None,
     row_offset_y: float = 0,
-    padding: float = 0
+    padding: float = 6.0
 ) -> None:
-    """
-    Insert text into a blank template.
 
-    No masking, redaction, or white rectangle is drawn.
-    """
+    text = (
+        ""
+        if value is None
+        else str(value)
+    )
 
-    required_keys = {
+    required = {
+        "cell",
         "write_position",
-        "box",
-        "font"
+        "font",
     }
 
     missing = (
-        required_keys
+        required
         - metadata.keys()
     )
 
@@ -92,11 +89,25 @@ def write_value(
             )
         )
 
+    cell = metadata[
+        "cell"
+    ]
 
-    text = (
-        ""
-        if value is None
-        else str(value)
+    left_x = float(
+        cell["x0"]
+    )
+
+    right_x = float(
+        cell["x1"]
+    )
+
+    available_width = max(
+        right_x
+        - left_x
+        - (
+            padding * 2
+        ),
+        1
     )
 
     font = metadata[
@@ -107,33 +118,12 @@ def write_value(
         font
     )
 
-    box = metadata[
-        "box"
-    ]
-
-    left_x = float(
-        box["x0"]
-    )
-
-    right_x = float(
-        box["x1"]
-    )
-
-    available_width = max(
-        right_x
-        - left_x
-        - (padding * 2),
-        1
-    )
-
-    preferred_size = float(
-        font["size"]
-    )
-
     font_size = fit_font_size(
         text=text,
         font_name=font_name,
-        preferred_size=preferred_size,
+        preferred_size=float(
+            font["size"]
+        ),
         available_width=available_width
     )
 
@@ -143,7 +133,7 @@ def write_value(
         fontsize=font_size
     )
 
-    resolved_alignment = (
+    alignment = (
         align
         or metadata.get(
             "align",
@@ -151,7 +141,7 @@ def write_value(
         )
     )
 
-    if resolved_alignment == "right":
+    if alignment == "right":
 
         write_x = (
             right_x
@@ -159,28 +149,28 @@ def write_value(
             - text_width
         )
 
-    elif resolved_alignment == "center":
+    elif alignment == "center":
 
         write_x = (
             left_x
             + (
-                available_width
+                right_x
+                - left_x
                 - text_width
-            ) / 2
-            + padding
+            )
+            / 2
         )
 
     else:
 
-        write_x = (
+        write_x = max(
             float(
                 metadata
                 ["write_position"]
                 ["x"]
-            )
-            + padding
+            ),
+            left_x + padding
         )
-
 
     baseline_y = (
         float(
@@ -190,7 +180,6 @@ def write_value(
         )
         + row_offset_y
     )
-
 
     page.insert_text(
         (
