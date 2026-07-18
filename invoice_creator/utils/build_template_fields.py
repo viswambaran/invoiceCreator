@@ -175,19 +175,19 @@ def build_fields(
 
         "cell": {
             "x0": round(
-                invoice_rect["x1"] + 8,
+                invoice_rect["x1"] + 16,
                 2
             ),
 
             "x1": round(
-                invoice_rect["x1"] + 85,
+                invoice_rect["x1"] + 90,
                 2
             ),
         },
 
         "write_position": {
             "x": round(
-                invoice_rect["x1"] + 12,
+                invoice_rect["x1"] + 18,
                 2
             ),
 
