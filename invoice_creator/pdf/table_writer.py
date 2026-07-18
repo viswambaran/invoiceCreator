@@ -1,5 +1,5 @@
 from invoice_creator.pdf.text_writer import (
-    write_in_area
+    write_value
 )
 
 
@@ -12,7 +12,9 @@ def format_table_value(
         "rate",
         "net"
     }:
+
         return f"{float(value):.2f}"
+
 
     if column_name == "units":
 
@@ -21,13 +23,17 @@ def format_table_value(
         )
 
         if numeric_value.is_integer():
+
             return str(
-                int(numeric_value)
+                int(
+                    numeric_value
+                )
             )
 
         return str(
             numeric_value
         )
+
 
     return str(
         value
@@ -40,23 +46,24 @@ def write_lines(
     table_metadata
 ) -> None:
 
-    table = (
-        table_metadata
-        ["invoice_lines"]
-    )
+    table = table_metadata[
+        "invoice_lines"
+    ]
 
     columns = table[
         "columns"
     ]
 
+
     if len(invoice.lines) > table["max_rows"]:
 
         raise ValueError(
             f"Invoice {invoice.invoice_no} has "
-            f"{len(invoice.lines)} lines, but the "
-            f"template supports only "
+            f"{len(invoice.lines)} lines, but "
+            f"the template supports only "
             f"{table['max_rows']}."
         )
+
 
     for row_index, line in enumerate(
         invoice.lines
@@ -81,18 +88,21 @@ def write_lines(
                 line.net
         }
 
+
         for column_name, value in (
             values.items()
         ):
 
             if column_name not in columns:
+
                 continue
 
-            column = columns[
+
+            column_metadata = columns[
                 column_name
             ]
 
-            write_in_area(
+            write_value(
                 page=page,
 
                 value=format_table_value(
@@ -100,23 +110,25 @@ def write_lines(
                     value
                 ),
 
-                value_rect=
-                    column["value_rect"],
-
-                write_position=
-                    column["write_position"],
-
-                font=
-                    column["font"],
+                metadata=
+                    column_metadata,
 
                 align=
-                    column
-                    ["write_position"]
-                    .get(
+                    column_metadata.get(
                         "align",
                         "left"
                     ),
 
                 row_offset_y=
-                    row_offset_y
+                    row_offset_y,
+
+                padding=(
+                    1
+                    if column_name in {
+                        "units",
+                        "rate",
+                        "net"
+                    }
+                    else 0
+                )
             )
