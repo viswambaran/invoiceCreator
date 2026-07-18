@@ -111,3 +111,48 @@ def write_in_area(
         color=colour,
         overlay=True
     )
+
+def write_metadata_value(
+    page,
+    value,
+    metadata,
+    align="left",
+    row_offset_y=0,
+    padding=0
+) -> None:
+    """
+    Render a value using its generated PDF metadata.
+
+    Expected metadata keys:
+        value_rect
+        write_position
+        font
+    """
+
+    required_keys = {
+        "value_rect",
+        "write_position",
+        "font"
+    }
+
+    missing_keys = (
+        required_keys
+        - metadata.keys()
+    )
+
+    if missing_keys:
+        raise KeyError(
+            "Incomplete PDF field metadata. "
+            f"Missing: {', '.join(sorted(missing_keys))}"
+        )
+
+    write_in_area(
+        page=page,
+        value=value,
+        value_rect=metadata["value_rect"],
+        write_position=metadata["write_position"],
+        font=metadata["font"],
+        align=align,
+        row_offset_y=row_offset_y,
+        padding=padding
+    )
