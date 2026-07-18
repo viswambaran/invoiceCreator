@@ -67,11 +67,6 @@ def save_json(
         exist_ok=True
     )
 
-    path.parent.mkdir(
-        parents=True,
-        exist_ok=True
-    )
-
     with open(
         path,
         "w",
@@ -378,9 +373,6 @@ def build_fields(
 
             "align":
                 "right",
-
-            "safe_clear_rect":
-                safe_clear_rect,
 
             "font":
                 label["font"]

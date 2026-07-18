@@ -147,18 +147,7 @@ def build_table(
     metadata: dict[str, Any]
 ) -> dict[str, Any]:
 
-    table: dict[str, Any] = {
-        "invoice_lines": {
-            "page": 1,
-            "columns": {},
-            "first_row_y": None,
-            "row_height": 20,
-            "max_rows": 5
-        }
-    }
-
     detected_headers = []
-
 
     for column_name, aliases in (
         COLUMN_HEADERS.items()
@@ -188,26 +177,6 @@ def build_table(
 
         print(
             f"✓ {column_name}"
-        )
-
-            print(
-                f"✓ {column_name}"
-            )
-
-        else:
-
-            print(
-                f"⚠ Missing {column_name}"
-            )
-
-
-    if len(detected_headers) != len(
-        COLUMN_HEADERS
-    ):
-
-        raise ValueError(
-            "One or more invoice table headers "
-            "could not be detected."
         )
 
 
@@ -317,23 +286,6 @@ def build_table(
 
             "align":
                 alignment,
-
-            "cell_rect":
-                cell_rect,
-
-            "safe_clear_rect":
-                safe_clear_rect,
-
-            "write_position": {
-                "x":
-                    write_x,
-
-                "y":
-                    first_row_y,
-
-                "align":
-                    alignment
-            },
 
             "font":
                 header["font"]

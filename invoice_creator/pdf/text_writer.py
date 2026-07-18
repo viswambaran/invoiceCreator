@@ -1,12 +1,9 @@
 from typing import Any
 
-from typing import Any
-
 import fitz
 
 
 def get_pdf_font_name(
-    font: dict[str, Any]
     font: dict[str, Any]
 ) -> str:
 

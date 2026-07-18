@@ -1,45 +1,34 @@
 from invoice_creator.pdf.text_writer import (
     write_value
-    write_metadata_value,
 )
 
 
 def format_table_value(
     column_name: str,
-    value,
+    value
 ) -> str:
 
     if column_name in {
         "rate",
-        "net",
+        "net"
     }:
-
         return f"{float(value):.2f}"
-
 
     if column_name == "units":
         numeric_value = float(value)
 
         if numeric_value.is_integer():
-
-            return str(
-                int(
-                    numeric_value
-                )
-            )
+            return str(int(numeric_value))
 
         return str(numeric_value)
 
-
-    return str(
-        value
-    )
+    return str(value)
 
 
 def write_lines(
     page,
     invoice,
-    table_metadata,
+    table_metadata
 ) -> None:
 
     table = table_metadata[
@@ -50,7 +39,6 @@ def write_lines(
         "columns"
     ]
 
-
     if len(invoice.lines) > table["max_rows"]:
         raise ValueError(
             f"Invoice {invoice.invoice_no} has "
@@ -59,10 +47,10 @@ def write_lines(
             f"{table['max_rows']}."
         )
 
-
     for row_index, line in enumerate(
         invoice.lines
     ):
+
         row_offset_y = (
             row_index
             * table["row_height"]
@@ -79,31 +67,45 @@ def write_lines(
                 line.rate,
 
             "net":
-                line.net,
+                line.net
         }
 
-
         for column_name, value in values.items():
+
             if column_name not in columns:
-
                 continue
-
 
             column_metadata = columns[
                 column_name
             ]
 
-            write_value(
-            alignment = (
-                metadata["write_position"]
-                .get(
-                    "align",
-                    "left",
-                )
-            )
+            #
+            # Each table column needs its own alignment
+            # and padding rather than one generic rule.
+            #
 
-            write_metadata_value(
+            if column_name == "description":
+                alignment = "left"
+                padding = 3
+
+            elif column_name == "units":
+                alignment = "center"
+                padding = 0
+
+            elif column_name in {
+                "rate",
+                "net"
+            }:
+                alignment = "right"
+                padding = 6
+
+            else:
+                alignment = "left"
+                padding = 0
+
+            write_value(
                 page=page,
+
                 value=format_table_value(
                     column_name,
                     value
@@ -113,21 +115,11 @@ def write_lines(
                     column_metadata,
 
                 align=
-                    column_metadata.get(
-                        "align",
-                        "left"
-                    ),
+                    alignment,
 
                 row_offset_y=
                     row_offset_y,
 
-                padding=(
-                    1
-                    if column_name in {
-                        "units",
-                        "rate",
-                        "net"
-                    }
-                    else 0
-                )
+                padding=
+                    padding
             )
