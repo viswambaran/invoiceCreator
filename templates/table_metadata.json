@@ -1,30 +1,27 @@
 {
     "invoice_lines": {
         "page": 1,
+        "table_rect": {
+            "x0": 43.0,
+            "y0": 316.99,
+            "x1": 552.38,
+            "y1": 532.51
+        },
+        "header_separator_y": 342.15,
+        "first_row_y": 357.0,
+        "row_height": 20.0,
+        "max_rows": 5,
         "columns": {
             "description": {
-                "header_position": {
-                    "x": 322.45,
-                    "y": 329.99
-                },
-                "column_width": 87.18,
-                "cell_rect": {
-                    "x0": 322.45,
-                    "y0": 336.99,
-                    "x1": 409.63,
-                    "y1": 359.99
-                },
-                "safe_clear_rect": {
-                    "x0": 324.45,
-                    "y0": 348.22,
-                    "x1": 407.63,
-                    "y1": 357.74
+                "cell": {
+                    "x0": 301.4,
+                    "x1": 394.68
                 },
                 "write_position": {
-                    "x": 326.45,
-                    "y": 356.99,
-                    "align": "left"
+                    "x": 308.4,
+                    "y": 357.0
                 },
+                "align": "left",
                 "font": {
                     "name": "Arial,Bold",
                     "size": 8.27,
@@ -42,28 +39,15 @@
                 }
             },
             "units": {
-                "header_position": {
-                    "x": 409.63,
-                    "y": 329.99
-                },
-                "column_width": 51.19,
-                "cell_rect": {
-                    "x0": 409.63,
-                    "y0": 336.99,
-                    "x1": 460.82,
-                    "y1": 359.99
-                },
-                "safe_clear_rect": {
-                    "x0": 411.63,
-                    "y0": 348.22,
-                    "x1": 458.82,
-                    "y1": 357.74
+                "cell": {
+                    "x0": 394.68,
+                    "x1": 444.92
                 },
                 "write_position": {
-                    "x": 409.63,
-                    "y": 356.99,
-                    "align": "right"
+                    "x": 401.68,
+                    "y": 357.0
                 },
+                "align": "center",
                 "font": {
                     "name": "Arial,Bold",
                     "size": 8.27,
@@ -81,28 +65,15 @@
                 }
             },
             "rate": {
-                "header_position": {
-                    "x": 460.82,
-                    "y": 329.99
-                },
-                "column_width": 52.15,
-                "cell_rect": {
-                    "x0": 460.82,
-                    "y0": 336.99,
-                    "x1": 512.97,
-                    "y1": 359.99
-                },
-                "safe_clear_rect": {
-                    "x0": 462.82,
-                    "y0": 348.22,
-                    "x1": 510.97,
-                    "y1": 357.74
+                "cell": {
+                    "x0": 444.92,
+                    "x1": 495.15
                 },
                 "write_position": {
-                    "x": 460.82,
-                    "y": 356.99,
-                    "align": "right"
+                    "x": 451.92,
+                    "y": 357.0
                 },
+                "align": "center",
                 "font": {
                     "name": "Arial,Bold",
                     "size": 8.27,
@@ -120,28 +91,15 @@
                 }
             },
             "net": {
-                "header_position": {
-                    "x": 512.97,
-                    "y": 329.99
-                },
-                "column_width": 60.0,
-                "cell_rect": {
-                    "x0": 512.97,
-                    "y0": 336.99,
-                    "x1": 572.97,
-                    "y1": 359.99
-                },
-                "safe_clear_rect": {
-                    "x0": 514.97,
-                    "y0": 348.22,
-                    "x1": 570.97,
-                    "y1": 357.74
+                "cell": {
+                    "x0": 495.15,
+                    "x1": 552.38
                 },
                 "write_position": {
-                    "x": 512.97,
-                    "y": 356.99,
-                    "align": "right"
+                    "x": 502.15,
+                    "y": 357.0
                 },
+                "align": "center",
                 "font": {
                     "name": "Arial,Bold",
                     "size": 8.27,
@@ -158,9 +116,76 @@
                     }
                 }
             }
+        }
+    },
+    "header_value_cells": {
+        "Service User": {
+            "cell": {
+                "x0": 43.0,
+                "x1": 179.4
+            },
+            "write_position": {
+                "x": 50.0,
+                "y": 357.0
+            },
+            "align": "left",
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
         },
-        "first_row_y": 356.99,
-        "row_height": 20,
-        "max_rows": 5
+        "Assessor": {
+            "cell": {
+                "x0": 179.4,
+                "x1": 301.4
+            },
+            "write_position": {
+                "x": 186.4,
+                "y": 357.0
+            },
+            "align": "left",
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        }
+    },
+    "totals": {
+        "table_rect": {
+            "x0": 365.98,
+            "y0": 547.01,
+            "x1": 552.44,
+            "y1": 581.39
+        },
+        "label_cell": {
+            "x0": 365.98,
+            "x1": 452.0
+        },
+        "value_cell": {
+            "x0": 452.0,
+            "x1": 552.44
+        }
     }
 }

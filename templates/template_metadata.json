@@ -1,7 +1,14 @@
 {
     "template_name": "Invoice Template",
-    "created": "2026-07-16T16:59:54.419738",
+    "created": "2026-07-18T23:21:15.406452",
     "pages": 1,
+    "page_sizes": [
+        {
+            "page": 1,
+            "width": 595.0,
+            "height": 842.0
+        }
+    ],
     "fields": [
         {
             "page": 1,
@@ -480,31 +487,6 @@
         },
         {
             "page": 1,
-            "text": "8",
-            "rect": {
-                "x0": 475.2,
-                "y0": 262.37,
-                "x1": 479.8,
-                "y1": 273.65
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
             "text": "Invoice Date : ",
             "rect": {
                 "x0": 401.86,
@@ -522,31 +504,6 @@
                 },
                 "style": {
                     "bold": true,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": ".2026",
-            "rect": {
-                "x0": 474.55,
-                "y0": 276.02,
-                "x1": 495.24,
-                "y1": 284.29
-            },
-            "font": {
-                "name": "Arial",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
                     "italic": false,
                     "serif": false,
                     "monospace": false
@@ -1207,109 +1164,9 @@
             "page": 1,
             "text": " ",
             "rect": {
-                "x0": 303.05,
-                "y0": 370.46,
-                "x1": 305.35,
-                "y1": 382.3
-            },
-            "font": {
-                "name": "Arial-BoldMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": true,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "Authorisation ",
-            "rect": {
                 "x0": 305.35,
                 "y0": 370.59,
-                "x1": 355.92,
-                "y1": 381.88
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": " 1.00 ",
-            "rect": {
-                "x0": 411.06,
-                "y0": 370.59,
-                "x1": 431.75,
-                "y1": 381.88
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "     50.00 ",
-            "rect": {
-                "x0": 447.06,
-                "y0": 370.59,
-                "x1": 481.54,
-                "y1": 381.88
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "   50.00",
-            "rect": {
-                "x0": 519.06,
-                "y0": 370.59,
-                "x1": 546.65,
+                "x1": 307.65,
                 "y1": 381.88
             },
             "font": {
@@ -1332,13 +1189,13 @@
             "page": 1,
             "text": " ",
             "rect": {
-                "x0": 546.65,
-                "y0": 370.46,
-                "x1": 548.95,
-                "y1": 382.3
+                "x0": 478.86,
+                "y0": 372.77,
+                "x1": 481.16,
+                "y1": 381.04
             },
             "font": {
-                "name": "Arial-BoldMT",
+                "name": "Arial",
                 "size": 8.27,
                 "colour": {
                     "r": 0,
@@ -1346,7 +1203,7 @@
                     "b": 0
                 },
                 "style": {
-                    "bold": true,
+                    "bold": false,
                     "italic": false,
                     "serif": false,
                     "monospace": false
@@ -1355,11 +1212,11 @@
         },
         {
             "page": 1,
-            "text": "BIA Assessment  ",
+            "text": "  ",
             "rect": {
                 "x0": 304.36,
                 "y0": 349.44,
-                "x1": 369.63,
+                "x1": 308.96,
                 "y1": 360.73
             },
             "font": {
@@ -1380,15 +1237,15 @@
         },
         {
             "page": 1,
-            "text": "1.00 ",
+            "text": " ",
             "rect": {
-                "x0": 412.37,
-                "y0": 349.44,
-                "x1": 430.76,
-                "y1": 360.73
+                "x0": 479.01,
+                "y0": 351.62,
+                "x1": 481.31,
+                "y1": 359.89
             },
             "font": {
-                "name": "ArialMT",
+                "name": "Arial",
                 "size": 8.27,
                 "colour": {
                     "r": 0,
@@ -1405,115 +1262,15 @@
         },
         {
             "page": 1,
-            "text": "  300.00 ",
+            "text": "  ",
             "rect": {
-                "x0": 448.36,
-                "y0": 349.44,
-                "x1": 480.55,
-                "y1": 360.73
+                "x0": 498.91,
+                "y0": 351.62,
+                "x1": 503.51,
+                "y1": 359.89
             },
             "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "300.00",
-            "rect": {
-                "x0": 520.36,
-                "y0": 349.44,
-                "x1": 545.65,
-                "y1": 360.73
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "350.00",
-            "rect": {
-                "x0": 521.18,
-                "y0": 548.11,
-                "x1": 546.47,
-                "y1": 559.4
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "70.00",
-            "rect": {
-                "x0": 525.78,
-                "y0": 559.69,
-                "x1": 546.47,
-                "y1": 570.98
-            },
-            "font": {
-                "name": "ArialMT",
-                "size": 8.27,
-                "colour": {
-                    "r": 0,
-                    "g": 0,
-                    "b": 0
-                },
-                "style": {
-                    "bold": false,
-                    "italic": false,
-                    "serif": false,
-                    "monospace": false
-                }
-            }
-        },
-        {
-            "page": 1,
-            "text": "420.00",
-            "rect": {
-                "x0": 521.18,
-                "y0": 571.27,
-                "x1": 546.47,
-                "y1": 582.55
-            },
-            "font": {
-                "name": "ArialMT",
+                "name": "Arial",
                 "size": 8.27,
                 "colour": {
                     "r": 0,
@@ -1552,6 +1309,158 @@
                     "monospace": false
                 }
             }
+        }
+    ],
+    "drawings": [
+        {
+            "page": 1,
+            "type": "rectangle",
+            "rect": {
+                "x0": 43.0,
+                "y0": 263.08,
+                "x1": 394.51,
+                "y1": 313.28
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "rectangle",
+            "rect": {
+                "x0": 43.0,
+                "y0": 316.99,
+                "x1": 552.38,
+                "y1": 532.51
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 43.0,
+                "y": 342.15
+            },
+            "end": {
+                "x": 552.56,
+                "y": 342.15
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 179.4,
+                "y": 317.0
+            },
+            "end": {
+                "x": 179.4,
+                "y": 532.63
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 301.4,
+                "y": 317.0
+            },
+            "end": {
+                "x": 301.4,
+                "y": 532.63
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 394.68,
+                "y": 317.0
+            },
+            "end": {
+                "x": 394.68,
+                "y": 532.63
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 444.92,
+                "y": 317.0
+            },
+            "end": {
+                "x": 444.92,
+                "y": 532.63
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 495.15,
+                "y": 317.0
+            },
+            "end": {
+                "x": 495.15,
+                "y": 532.63
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "rectangle",
+            "rect": {
+                "x0": 365.98,
+                "y0": 547.01,
+                "x1": 552.44,
+                "y1": 581.39
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 365.98,
+                "y": 558.51
+            },
+            "end": {
+                "x": 552.56,
+                "y": 558.51
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 365.98,
+                "y": 570.01
+            },
+            "end": {
+                "x": 552.56,
+                "y": 570.01
+            },
+            "width": 0.12
+        },
+        {
+            "page": 1,
+            "type": "line",
+            "start": {
+                "x": 452.0,
+                "y": 547.01
+            },
+            "end": {
+                "x": 452.0,
+                "y": 581.51
+            },
+            "width": 0.12
         }
     ]
 }

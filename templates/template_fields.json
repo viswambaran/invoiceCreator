@@ -5,28 +5,15 @@
         "Invoice No": {
             "pdf_label": "Invoice No : ",
             "page": 1,
-            "label_rect": {
-                "x0": 401.86,
-                "y0": 264.93,
-                "x1": 451.03,
-                "y1": 273.2
+            "cell": {
+                "x0": 467.03,
+                "x1": 541.03
             },
             "write_position": {
-                "x": 463.03,
+                "x": 469.03,
                 "y": 273.2
             },
-            "value_rect": {
-                "x0": 461.03,
-                "y0": 262.93,
-                "x1": 533.03,
-                "y1": 275.2
-            },
-            "safe_clear_rect": {
-                "x0": 462.03,
-                "y0": 264.43,
-                "x1": 532.03,
-                "y1": 273.95
-            },
+            "align": "left",
             "font": {
                 "name": "Arial,Bold",
                 "size": 8.27,
@@ -46,28 +33,15 @@
         "Service User": {
             "pdf_label": "Service User",
             "page": 1,
-            "label_rect": {
-                "x0": 52.36,
-                "y0": 321.16,
-                "x1": 102.47,
-                "y1": 333.0
+            "cell": {
+                "x0": 43.0,
+                "x1": 179.4
             },
             "write_position": {
-                "x": 56.36,
-                "y": 351.0
+                "x": 50.0,
+                "y": 357.0
             },
-            "value_rect": {
-                "x0": 52.36,
-                "y0": 340.73,
-                "x1": 232.36,
-                "y1": 353.0
-            },
-            "safe_clear_rect": {
-                "x0": 54.36,
-                "y0": 342.23,
-                "x1": 230.36,
-                "y1": 351.75
-            },
+            "align": "left",
             "font": {
                 "name": "Arial-BoldMT",
                 "size": 8.27,
@@ -87,28 +61,15 @@
         "Assessor": {
             "pdf_label": "BIA/DR",
             "page": 1,
-            "label_rect": {
-                "x0": 232.36,
-                "y0": 321.16,
-                "x1": 260.85,
-                "y1": 333.0
+            "cell": {
+                "x0": 179.4,
+                "x1": 301.4
             },
             "write_position": {
-                "x": 236.36,
-                "y": 351.0
+                "x": 186.4,
+                "y": 357.0
             },
-            "value_rect": {
-                "x0": 232.36,
-                "y0": 340.73,
-                "x1": 322.45,
-                "y1": 353.0
-            },
-            "safe_clear_rect": {
-                "x0": 234.36,
-                "y0": 342.23,
-                "x1": 320.45,
-                "y1": 351.75
-            },
+            "align": "left",
             "font": {
                 "name": "Arial-BoldMT",
                 "size": 8.27,
@@ -128,30 +89,17 @@
         "Net Amount": {
             "pdf_label": "Net Amount",
             "page": 1,
-            "label_rect": {
-                "x0": 373.16,
-                "y0": 548.86,
-                "x1": 420.02,
-                "y1": 557.13
+            "cell": {
+                "x0": 452.0,
+                "x1": 552.44
             },
             "write_position": {
-                "x": 521.18,
-                "y": 559.4
+                "x": 452.0,
+                "y": 557.13
             },
-            "value_rect": {
-                "x0": 521.18,
-                "y0": 548.11,
-                "x1": 546.47,
-                "y1": 559.4
-            },
-            "safe_clear_rect": {
-                "x0": 521.18,
-                "y0": 548.11,
-                "x1": 546.47,
-                "y1": 559.4
-            },
+            "align": "right",
             "font": {
-                "name": "ArialMT",
+                "name": "Arial,Bold",
                 "size": 8.27,
                 "colour": {
                     "r": 0,
@@ -159,7 +107,7 @@
                     "b": 0
                 },
                 "style": {
-                    "bold": false,
+                    "bold": true,
                     "italic": false,
                     "serif": false,
                     "monospace": false
@@ -169,30 +117,17 @@
         "VAT": {
             "pdf_label": "Total Vat @ 20.00%",
             "page": 1,
-            "label_rect": {
-                "x0": 373.16,
-                "y0": 560.36,
-                "x1": 448.79,
-                "y1": 568.63
+            "cell": {
+                "x0": 452.0,
+                "x1": 552.44
             },
             "write_position": {
-                "x": 525.78,
-                "y": 570.98
+                "x": 452.0,
+                "y": 568.63
             },
-            "value_rect": {
-                "x0": 525.78,
-                "y0": 559.69,
-                "x1": 546.47,
-                "y1": 570.98
-            },
-            "safe_clear_rect": {
-                "x0": 525.78,
-                "y0": 559.69,
-                "x1": 546.47,
-                "y1": 570.98
-            },
+            "align": "right",
             "font": {
-                "name": "ArialMT",
+                "name": "Arial,Bold",
                 "size": 8.27,
                 "colour": {
                     "r": 0,
@@ -200,7 +135,7 @@
                     "b": 0
                 },
                 "style": {
-                    "bold": false,
+                    "bold": true,
                     "italic": false,
                     "serif": false,
                     "monospace": false
@@ -210,30 +145,17 @@
         "Invoice Total": {
             "pdf_label": "Invoice Total",
             "page": 1,
-            "label_rect": {
-                "x0": 373.16,
-                "y0": 571.86,
-                "x1": 423.71,
-                "y1": 580.13
+            "cell": {
+                "x0": 452.0,
+                "x1": 552.44
             },
             "write_position": {
-                "x": 521.18,
-                "y": 582.55
+                "x": 452.0,
+                "y": 580.13
             },
-            "value_rect": {
-                "x0": 521.18,
-                "y0": 571.27,
-                "x1": 546.47,
-                "y1": 582.55
-            },
-            "safe_clear_rect": {
-                "x0": 521.18,
-                "y0": 571.27,
-                "x1": 546.47,
-                "y1": 582.55
-            },
+            "align": "right",
             "font": {
-                "name": "ArialMT",
+                "name": "Arial,Bold",
                 "size": 8.27,
                 "colour": {
                     "r": 0,
@@ -241,7 +163,7 @@
                     "b": 0
                 },
                 "style": {
-                    "bold": false,
+                    "bold": true,
                     "italic": false,
                     "serif": false,
                     "monospace": false
