@@ -1,29 +1,67 @@
+from __future__ import annotations
+
+from io import BytesIO
+from pathlib import Path
+from typing import BinaryIO
+
 import pandas as pd
 
 
+ExcelSource = (
+    str
+    | Path
+    | bytes
+    | bytearray
+    | BinaryIO
+)
+
+
 class ExcelImporter:
+    def __init__(
+        self,
+        source: ExcelSource,
+        sheet_name: str | int = 0,
+    ) -> None:
+        self.source = source
+        self.sheet_name = sheet_name
 
+    def _create_source(self):
+        if isinstance(
+            self.source,
+            (bytes, bytearray),
+        ):
+            return BytesIO(self.source)
 
-    def __init__(self, file_path):
+        if hasattr(self.source, "seek"):
+            self.source.seek(0)
 
-        self.file_path = file_path
+        return self.source
 
+    def load_dataframe(self) -> pd.DataFrame:
+        source = self._create_source()
 
-
-    def load_rows(self):
-
-        df = pd.read_excel(
-            self.file_path
+        dataframe = pd.read_excel(
+            source,
+            sheet_name=self.sheet_name,
         )
 
-        ## Clean the headers remove trailing spaces 
-        df.columns = (
-            df.columns
-            .astype(str).
-            str.strip()
-        )
+        dataframe.columns = [
+            str(column).strip()
+            for column in dataframe.columns
+        ]
 
+        return dataframe
 
-        return df.to_dict(
+    def load_rows(self) -> list[dict]:
+        dataframe = self.load_dataframe()
+
+        return dataframe.to_dict(
             orient="records"
         )
+
+    def get_sheet_names(self) -> list[str]:
+        source = self._create_source()
+
+        workbook = pd.ExcelFile(source)
+
+        return list(workbook.sheet_names)

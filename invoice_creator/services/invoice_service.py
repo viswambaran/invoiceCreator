@@ -1,151 +1,178 @@
 from __future__ import annotations
 
+import json
 from datetime import date
-from decimal import Decimal, InvalidOperation
-from io import BytesIO
+from decimal import Decimal
+from pathlib import Path
 from typing import BinaryIO
 
 import pandas as pd
 
-from invoice_creator.models.app_invoice import (
-    AppInvoice,
-    AppInvoiceLine,
+from invoice_creator.importers.excel import (
+    ExcelImporter,
+)
+from invoice_creator.mapping.engine import (
+    MappingEngine,
+    MappingError,
+)
+from invoice_creator.models.invoice import (
+    Invoice,
 )
 
 
-INVOICE_COLUMN = "Invoice No"
-SERVICE_USER_COLUMN = "Client Name"
-ASSESSOR_COLUMN = "Assessor"
-CHARGE_COLUMN = "Charge"
-QA_CHARGE_COLUMN = "QA Charge"
+PROJECT_ROOT = (
+    Path(__file__)
+    .resolve()
+    .parents[2]
+)
+
+DEFAULT_MAPPING_PATH = (
+    PROJECT_ROOT
+    / "templates"
+    / "mapping.json"
+)
+
+DEFAULT_RULES_PATH = (
+    PROJECT_ROOT
+    / "templates"
+    / "mapping_rules.json"
+)
 
 
 class InvoiceBuildError(Exception):
-    """Raised when a workbook cannot be converted into invoices."""
+    pass
 
 
-def clean_column_name(value: object) -> str:
-    return str(value).strip()
-
-
-def clean_text(value: object) -> str:
-    if value is None:
-        return ""
-
-    try:
-        if pd.isna(value):
-            return ""
-    except (TypeError, ValueError):
-        pass
-
-    return str(value).strip()
-
-
-def to_decimal(
-    value: object,
-    *,
-    default: Decimal = Decimal("0.00"),
-) -> Decimal:
-    if value is None:
-        return default
-
-    try:
-        if pd.isna(value):
-            return default
-    except (TypeError, ValueError):
-        pass
-
-    if isinstance(value, Decimal):
-        return value
-
-    if isinstance(value, str):
-        value = (
-            value.strip()
-            .replace("£", "")
-            .replace(",", "")
+def _load_json(
+    path: Path,
+) -> dict:
+    if not path.exists():
+        raise InvoiceBuildError(
+            f"Required configuration file "
+            f"was not found: {path}"
         )
 
-        if not value:
-            return default
-
     try:
-        return Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError):
-        raise ValueError(
-            f"Could not convert {value!r} into a number."
-        )
+        with path.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
+            return json.load(file)
+    except json.JSONDecodeError as exc:
+        raise InvoiceBuildError(
+            f"Configuration file contains "
+            f"invalid JSON: {path}"
+        ) from exc
 
 
-def money(value: Decimal) -> Decimal:
-    return value.quantize(Decimal("0.01"))
+def load_mapping() -> dict:
+    return _load_json(
+        DEFAULT_MAPPING_PATH
+    )
+
+
+def load_mapping_rules() -> dict:
+    return _load_json(
+        DEFAULT_RULES_PATH
+    )
 
 
 def load_workbook(
     uploaded_file: BinaryIO | bytes,
     sheet_name: str | int = 0,
 ) -> pd.DataFrame:
-    """
-    Load an uploaded Excel workbook and clean its column names.
-    """
-
-    if isinstance(uploaded_file, bytes):
-        source = BytesIO(uploaded_file)
-    else:
-        source = uploaded_file
-
     try:
-        dataframe = pd.read_excel(
-            source,
+        importer = ExcelImporter(
+            source=uploaded_file,
             sheet_name=sheet_name,
         )
+
+        return importer.load_dataframe()
+
     except Exception as exc:
         raise InvoiceBuildError(
-            f"The Excel workbook could not be read: {exc}"
+            "The Excel workbook could not "
+            f"be read: {exc}"
         ) from exc
-
-    dataframe.columns = [
-        clean_column_name(column)
-        for column in dataframe.columns
-    ]
-
-    return dataframe
 
 
 def get_sheet_names(
     uploaded_file: BinaryIO | bytes,
 ) -> list[str]:
-    if isinstance(uploaded_file, bytes):
-        source = BytesIO(uploaded_file)
-    else:
-        source = uploaded_file
-
     try:
-        workbook = pd.ExcelFile(source)
+        importer = ExcelImporter(
+            source=uploaded_file
+        )
+
+        return importer.get_sheet_names()
+
     except Exception as exc:
         raise InvoiceBuildError(
-            f"The Excel workbook could not be opened: {exc}"
+            "The Excel workbook could not "
+            f"be opened: {exc}"
         ) from exc
-
-    return list(workbook.sheet_names)
 
 
 def required_columns() -> list[str]:
-    return [
-        INVOICE_COLUMN,
-        SERVICE_USER_COLUMN,
-        ASSESSOR_COLUMN,
-        CHARGE_COLUMN,
-        QA_CHARGE_COLUMN,
-    ]
+    mapping = load_mapping()
+    rules = load_mapping_rules()
+
+    columns: list[str] = []
+
+    invoice_mapping = mapping.get(
+        "invoice",
+        {},
+    )
+
+    for field_mapping in (
+        invoice_mapping.values()
+    ):
+        if (
+            field_mapping.get("type")
+            == "column"
+        ):
+            value = field_mapping.get(
+                "value"
+            )
+
+            if value:
+                columns.append(
+                    str(value).strip()
+                )
+
+    charge_rules = (
+        rules
+        .get("invoice_lines", {})
+        .get("charge_types", [])
+    )
+
+    for rule in charge_rules:
+        source_column = rule.get(
+            "source_column"
+        )
+
+        if source_column:
+            columns.append(
+                str(source_column).strip()
+            )
+
+    return list(
+        dict.fromkeys(columns)
+    )
 
 
 def missing_columns(
     dataframe: pd.DataFrame,
 ) -> list[str]:
+    available_columns = {
+        str(column).strip()
+        for column in dataframe.columns
+    }
+
     return [
         column
         for column in required_columns()
-        if column not in dataframe.columns
+        if column not in available_columns
     ]
 
 
@@ -155,108 +182,39 @@ def build_invoices(
     vat_rate: Decimal = Decimal("20"),
     default_units: Decimal = Decimal("1"),
     include_zero_lines: bool = True,
-) -> list[AppInvoice]:
-    """
-    Build one invoice per Excel row.
-
-    Charge becomes the BIA Assessment line.
-    QA Charge becomes the Authorisation line.
-    """
-
-    missing = missing_columns(dataframe)
+) -> list[Invoice]:
+    missing = missing_columns(
+        dataframe
+    )
 
     if missing:
-        joined = ", ".join(missing)
-
         raise InvoiceBuildError(
-            "The workbook is missing these required columns: "
-            f"{joined}"
+            "The workbook is missing these "
+            "required columns: "
+            + ", ".join(missing)
         )
 
-    invoices: list[AppInvoice] = []
+    rows = dataframe.to_dict(
+        orient="records"
+    )
 
-    vat_multiplier = vat_rate / Decimal("100")
-
-    for row_position, (_, row) in enumerate(
-        dataframe.iterrows(),
-        start=1,
-    ):
-        invoice_no = clean_text(
-            row.get(INVOICE_COLUMN)
+    try:
+        engine = MappingEngine(
+            mapping=load_mapping(),
+            rules=load_mapping_rules(),
+            invoice_date=invoice_date,
+            vat_rate=vat_rate,
+            default_units=default_units,
+            include_zero_lines=(
+                include_zero_lines
+            ),
         )
 
-        service_user = clean_text(
-            row.get(SERVICE_USER_COLUMN)
+        return engine.build_invoices(
+            rows
         )
 
-        assessor = clean_text(
-            row.get(ASSESSOR_COLUMN)
-        )
-
-        try:
-            charge = money(
-                to_decimal(row.get(CHARGE_COLUMN))
-            )
-
-            qa_charge = money(
-                to_decimal(row.get(QA_CHARGE_COLUMN))
-            )
-        except ValueError as exc:
-            # Keep the invoice available for review and validation.
-            # Invalid numeric fields are represented as zero here and
-            # separately flagged by validation.
-            charge = Decimal("0.00")
-            qa_charge = Decimal("0.00")
-
-        lines: list[AppInvoiceLine] = []
-
-        if include_zero_lines or charge != 0:
-            lines.append(
-                AppInvoiceLine(
-                    description="BIA Assessment",
-                    units=default_units,
-                    rate=charge,
-                    net=money(default_units * charge),
-                )
-            )
-
-        if include_zero_lines or qa_charge != 0:
-            lines.append(
-                AppInvoiceLine(
-                    description="Authorisation",
-                    units=default_units,
-                    rate=qa_charge,
-                    net=money(default_units * qa_charge),
-                )
-            )
-
-        net_amount = money(
-            sum(
-                (line.net for line in lines),
-                Decimal("0.00"),
-            )
-        )
-
-        vat = money(
-            net_amount * vat_multiplier
-        )
-
-        invoice_total = money(
-            net_amount + vat
-        )
-
-        invoices.append(
-            AppInvoice(
-                row_id=row_position,
-                invoice_no=invoice_no,
-                invoice_date=invoice_date,
-                service_user=service_user,
-                assessor=assessor,
-                lines=lines,
-                net_amount=net_amount,
-                vat=vat,
-                invoice_total=invoice_total,
-            )
-        )
-
-    return invoices
+    except MappingError as exc:
+        raise InvoiceBuildError(
+            str(exc)
+        ) from exc

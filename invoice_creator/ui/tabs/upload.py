@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from io import BytesIO
 
 import streamlit as st
 
@@ -18,59 +17,144 @@ from invoice_creator.services.validation_service import (
 from invoice_creator.ui.state import (
     clear_generation_results,
     clear_invoice_results,
+    queue_toast,
+    request_workflow_step,
 )
 
 
-def _save_excel_upload(
+def _store_excel(
     uploaded_file,
 ) -> None:
-    uploaded_bytes = uploaded_file.getvalue()
+    data = uploaded_file.getvalue()
 
-    file_changed = (
+    same_file = (
         st.session_state.excel_filename
-        != uploaded_file.name
-        or st.session_state.excel_bytes
-        != uploaded_bytes
+        == uploaded_file.name
+        and st.session_state.excel_bytes
+        == data
     )
 
-    if not file_changed:
+    if same_file:
         return
 
-    st.session_state.excel_file = uploaded_file
-    st.session_state.excel_bytes = uploaded_bytes
-    st.session_state.excel_filename = uploaded_file.name
+    st.session_state.excel_file = (
+        uploaded_file
+    )
+
+    st.session_state.excel_filename = (
+        uploaded_file.name
+    )
+
+    st.session_state.excel_bytes = data
 
     clear_invoice_results()
 
-    st.session_state.sheet_names = get_sheet_names(
-        uploaded_bytes
-    )
+    try:
+        sheets = get_sheet_names(
+            data
+        )
+
+    except Exception as exc:
+        st.session_state.sheet_names = []
+
+        st.session_state.selected_sheet = (
+            None
+        )
+
+        st.error(
+            "The workbook could not be read."
+        )
+
+        st.exception(exc)
+        return
+
+    st.session_state.sheet_names = sheets
 
     st.session_state.selected_sheet = (
-        st.session_state.sheet_names[0]
-        if st.session_state.sheet_names
+        sheets[0]
+        if sheets
         else None
     )
 
+    sheet_message = (
+        f"{len(sheets)} worksheet"
+        if len(sheets) == 1
+        else f"{len(sheets)} worksheets"
+    )
 
-def _save_template_upload(
+    st.toast(
+        (
+            f"{uploaded_file.name} uploaded. "
+            f"Found {sheet_message}."
+        ),
+        icon="✅",
+    )
+
+
+def _store_template(
     uploaded_file,
 ) -> None:
     if uploaded_file is None:
         return
 
-    uploaded_bytes = uploaded_file.getvalue()
+    data = uploaded_file.getvalue()
 
-    st.session_state.template_file = uploaded_file
-    st.session_state.template_bytes = uploaded_bytes
+    same_file = (
+        st.session_state.template_filename
+        == uploaded_file.name
+        and st.session_state.template_bytes
+        == data
+    )
+
+    if same_file:
+        return
+
+    st.session_state.template_file = (
+        uploaded_file
+    )
+
     st.session_state.template_filename = (
         uploaded_file.name
     )
 
+    st.session_state.template_bytes = data
+
     clear_generation_results()
 
+    st.toast(
+        (
+            f"{uploaded_file.name} uploaded "
+            "as the PDF template."
+        ),
+        icon="✅",
+    )
 
-def _build_current_invoices() -> None:
+
+def _show_uploaded_file_summary() -> None:
+    if st.session_state.excel_filename:
+        st.success(
+            (
+                "Workbook ready: "
+                f"**{st.session_state.excel_filename}**"
+            ),
+            icon="✅",
+        )
+
+    if st.session_state.template_filename:
+        st.success(
+            (
+                "Custom template ready: "
+                f"**{st.session_state.template_filename}**"
+            ),
+            icon="✅",
+        )
+    else:
+        st.info(
+            "The default project PDF template will be used."
+        )
+
+
+def _build() -> None:
     if not st.session_state.excel_bytes:
         st.error(
             "Upload an Excel workbook first."
@@ -83,116 +167,333 @@ def _build_current_invoices() -> None:
         )
         return
 
+    progress = st.progress(
+        0,
+        text="Preparing workbook...",
+    )
+
     try:
-        dataframe = load_workbook(
-            st.session_state.excel_bytes,
-            sheet_name=st.session_state.selected_sheet,
-        )
-
-        missing = missing_columns(
-            dataframe
-        )
-
-        if missing:
-            st.error(
-                "Required columns are missing: "
-                + ", ".join(missing)
+        with st.status(
+            "Building invoices...",
+            expanded=True,
+        ) as status:
+            status.write(
+                "Reading the selected worksheet."
             )
-            return
 
-        invoices = build_invoices(
-            dataframe=dataframe,
-            invoice_date=st.session_state.invoice_date,
-            vat_rate=Decimal(
-                str(st.session_state.vat_rate)
-            ),
-            default_units=Decimal(
-                str(st.session_state.default_units)
-            ),
-            include_zero_lines=(
-                st.session_state.include_zero_lines
-            ),
-        )
-
-        validation = validate_invoices(
-            invoices
-        )
-
-        st.session_state.workbook_dataframe = (
-            dataframe
-        )
-
-        st.session_state.invoices = invoices
-        st.session_state.validation = validation
-
-        st.session_state.invoice_selection = {
-            invoice.row_id: (
-                result.status != "Blocked"
+            progress.progress(
+                15,
+                text="Reading worksheet...",
             )
-            for invoice, result in zip(
-                invoices,
-                validation,
+
+            dataframe = load_workbook(
+                st.session_state.excel_bytes,
+                st.session_state.selected_sheet,
             )
-        }
 
-        st.session_state.selected_invoice = (
-            invoices[0].row_id
-            if invoices
-            else None
+            row_count = len(
+                dataframe.index
+            )
+
+            status.write(
+                (
+                    f"Loaded {row_count} spreadsheet "
+                    f"{'row' if row_count == 1 else 'rows'}."
+                )
+            )
+
+            progress.progress(
+                35,
+                text="Checking required columns...",
+            )
+
+            missing = missing_columns(
+                dataframe
+            )
+
+            if missing:
+                status.update(
+                    label="Workbook validation failed",
+                    state="error",
+                    expanded=True,
+                )
+
+                progress.empty()
+
+                st.error(
+                    "Missing required columns:\n\n"
+                    + "\n".join(
+                        f"- {column}"
+                        for column in missing
+                    )
+                )
+                return
+
+            status.write(
+                "Required columns are present."
+            )
+
+            progress.progress(
+                55,
+                text="Creating invoice records...",
+            )
+
+            invoices = build_invoices(
+                dataframe=dataframe,
+                invoice_date=(
+                    st.session_state.invoice_date
+                ),
+                vat_rate=Decimal(
+                    str(
+                        st.session_state.vat_rate
+                    )
+                ),
+                default_units=Decimal(
+                    str(
+                        st.session_state
+                        .default_units
+                    )
+                ),
+                include_zero_lines=(
+                    st.session_state
+                    .include_zero_lines
+                ),
+            )
+
+            status.write(
+                (
+                    f"Created {len(invoices)} "
+                    f"{'invoice' if len(invoices) == 1 else 'invoices'}."
+                )
+            )
+
+            progress.progress(
+                80,
+                text="Validating invoices...",
+            )
+
+            validation = validate_invoices(
+                invoices
+            )
+
+            st.session_state.workbook_dataframe = (
+                dataframe
+            )
+
+            st.session_state.invoices = invoices
+
+            st.session_state.validation = (
+                validation
+            )
+
+            st.session_state.invoice_selection = {
+                invoice.row_id: (
+                    result.status != "Blocked"
+                )
+                for invoice, result in zip(
+                    invoices,
+                    validation,
+                )
+            }
+
+            clear_generation_results()
+
+            ready_count = sum(
+                result.status == "Ready"
+                for result in validation
+            )
+
+            warning_count = sum(
+                result.status == "Warning"
+                for result in validation
+            )
+
+            blocked_count = sum(
+                result.status == "Blocked"
+                for result in validation
+            )
+
+            progress.progress(
+                100,
+                text="Invoice build complete.",
+            )
+
+            status.write(
+                (
+                    f"Ready: {ready_count} · "
+                    f"Warnings: {warning_count} · "
+                    f"Blocked: {blocked_count}"
+                )
+            )
+
+            status.update(
+                label=(
+                    f"Build complete — "
+                    f"{len(invoices)} invoices created"
+                ),
+                state="complete",
+                expanded=False,
+            )
+
+        queue_toast(
+            (
+                f"Upload processed successfully. "
+                f"{len(invoices)} invoices were created."
+            ),
+            icon="✅",
         )
 
-        clear_generation_results()
-
-        st.success(
-            f"Built {len(invoices)} invoices."
+        request_workflow_step(
+            "Review"
         )
+
+        st.rerun()
 
     except InvoiceBuildError as exc:
-        st.error(str(exc))
+        progress.empty()
+
+        st.error(
+            str(exc)
+        )
+
     except Exception as exc:
+        progress.empty()
+
+        st.error(
+            "An unexpected error occurred while building invoices."
+        )
+
         st.exception(exc)
 
 
-def render_upload_tab() -> None:
-    st.subheader("Source files")
+def _render_existing_build_summary() -> None:
+    if not st.session_state.invoices:
+        return
 
-    left, right = st.columns(
-        [2, 1],
-        gap="large",
+    ready = sum(
+        result.status == "Ready"
+        for result in st.session_state.validation
     )
 
-    with left:
-        excel_file = st.file_uploader(
-            "Excel workbook",
-            type=["xlsx", "xls"],
-            help=(
-                "Each spreadsheet row is currently treated "
-                "as one invoice."
-            ),
+    warning = sum(
+        result.status == "Warning"
+        for result in st.session_state.validation
+    )
+
+    blocked = sum(
+        result.status == "Blocked"
+        for result in st.session_state.validation
+    )
+
+    st.subheader("Current invoice batch")
+
+    column_one, column_two, column_three, column_four = (
+        st.columns(4)
+    )
+
+    column_one.metric(
+        "Invoices",
+        len(
+            st.session_state.invoices
+        ),
+    )
+
+    column_two.metric(
+        "Ready",
+        ready,
+    )
+
+    column_three.metric(
+        "Warnings",
+        warning,
+    )
+
+    column_four.metric(
+        "Blocked",
+        blocked,
+    )
+
+    if st.button(
+        "Continue to Review",
+        type="primary",
+        width="stretch",
+    ):
+        request_workflow_step(
+            "Review"
         )
 
-        if excel_file is not None:
-            try:
-                _save_excel_upload(
-                    excel_file
-                )
-            except Exception as exc:
-                st.error(
-                    f"Could not inspect the workbook: {exc}"
-                )
+        st.rerun()
+
+
+def render_upload_tab() -> None:
+    st.header("Upload and Setup")
+
+    st.write(
+        "Upload the Excel workbook and optionally "
+        "replace the default PDF template."
+    )
+
+    left_column, right_column = (
+        st.columns(
+            [2, 1],
+            gap="large",
+        )
+    )
+
+    with left_column:
+        workbook = st.file_uploader(
+            "Excel workbook",
+            type=[
+                "xlsx",
+                "xls",
+            ],
+            help=(
+                "Each spreadsheet row currently "
+                "creates one invoice."
+            ),
+            key="excel_workbook_uploader",
+        )
+
+        if workbook is not None:
+            _store_excel(
+                workbook
+            )
 
         if st.session_state.sheet_names:
+            current_sheet = (
+                st.session_state.selected_sheet
+            )
+
+            if (
+                current_sheet
+                not in st.session_state.sheet_names
+            ):
+                current_sheet = (
+                    st.session_state
+                    .sheet_names[0]
+                )
+
+            selected_index = (
+                st.session_state
+                .sheet_names
+                .index(
+                    current_sheet
+                )
+            )
+
             selected_sheet = st.selectbox(
                 "Worksheet",
-                options=st.session_state.sheet_names,
-                index=st.session_state.sheet_names.index(
-                    st.session_state.selected_sheet
+                options=(
+                    st.session_state.sheet_names
                 ),
+                index=selected_index,
+                key="worksheet_selector",
             )
 
             if (
                 selected_sheet
-                != st.session_state.selected_sheet
+                != st.session_state
+                .selected_sheet
             ):
                 st.session_state.selected_sheet = (
                     selected_sheet
@@ -200,101 +501,57 @@ def render_upload_tab() -> None:
 
                 clear_invoice_results()
 
-        template_file = st.file_uploader(
-            "Replacement PDF template",
+                st.toast(
+                    (
+                        f"Worksheet changed to "
+                        f"{selected_sheet}."
+                    ),
+                    icon="📄",
+                )
+
+        template = st.file_uploader(
+            "PDF template",
             type=["pdf"],
             help=(
-                "Leave this empty to use the default "
-                "invoice template."
+                "Optional. Leave empty to use "
+                "the default project template."
             ),
+            key="pdf_template_uploader",
         )
 
-        if template_file is not None:
-            _save_template_upload(
-                template_file
+        if template is not None:
+            _store_template(
+                template
             )
 
-    with right:
-        st.markdown("#### Current source")
+        _show_uploaded_file_summary()
 
-        st.metric(
-            "Workbook",
-            (
-                st.session_state.excel_filename
-                or "Not loaded"
-            ),
+    with right_column:
+        st.subheader(
+            "Invoice settings"
         )
 
-        st.metric(
-            "Template",
-            (
-                st.session_state.template_filename
-                or "Default template"
-            ),
-        )
-
-        st.metric(
-            "Invoices built",
-            len(st.session_state.invoices),
-        )
-
-    st.divider()
-
-    st.subheader("Invoice settings")
-
-    settings_left, settings_right = st.columns(
-        2,
-        gap="large",
-    )
-
-    with settings_left:
-        st.session_state.invoice_date_mode = (
-            st.radio(
-                "Invoice date source",
-                options=[
-                    "One date for all invoices",
-                    "Use an Excel date column",
-                    "Assign dates during review",
-                ],
-                index=[
-                    "One date for all invoices",
-                    "Use an Excel date column",
-                    "Assign dates during review",
-                ].index(
-                    st.session_state.invoice_date_mode
+        st.session_state.invoice_date = (
+            st.date_input(
+                "Invoice date",
+                value=(
+                    st.session_state
+                    .invoice_date
                 ),
+                format="DD/MM/YYYY",
             )
         )
 
-        if (
-            st.session_state.invoice_date_mode
-            == "One date for all invoices"
-        ):
-            st.session_state.invoice_date = (
-                st.date_input(
-                    "Invoice date",
-                    value=st.session_state.invoice_date,
-                    format="DD/MM/YYYY",
-                )
-            )
-        else:
-            st.info(
-                "The global calendar mode is currently "
-                "implemented. Excel-column and individual "
-                "date modes will be connected through the "
-                "Mapping and Review pages."
-            )
-
-    with settings_right:
         st.session_state.vat_rate = (
             st.number_input(
-                "VAT rate (%)",
+                "VAT percentage",
                 min_value=0.0,
                 max_value=100.0,
                 value=float(
                     st.session_state.vat_rate
                 ),
-                step=0.5,
+                step=1.0,
+                format="%.2f",
             )
         )
 
@@ -303,9 +560,11 @@ def render_upload_tab() -> None:
                 "Default units",
                 min_value=0.0,
                 value=float(
-                    st.session_state.default_units
+                    st.session_state
+                    .default_units
                 ),
                 step=1.0,
+                format="%.2f",
             )
         )
 
@@ -313,51 +572,39 @@ def render_upload_tab() -> None:
             st.checkbox(
                 "Include zero-value lines",
                 value=(
-                    st.session_state.include_zero_lines
+                    st.session_state
+                    .include_zero_lines
                 ),
             )
         )
 
+        st.info(
+            (
+                "Current rule: every spreadsheet "
+                "row creates one invoice."
+            ),
+            icon="ℹ️",
+        )
+
     st.divider()
 
+    build_disabled = not bool(
+        st.session_state.excel_bytes
+        and st.session_state.selected_sheet
+    )
+
     if st.button(
-        "Build and validate invoices",
+        "Build Invoices",
         type="primary",
-        use_container_width=True,
+        width="stretch",
+        disabled=build_disabled,
     ):
-        _build_current_invoices()
+        _build()
 
-    if st.session_state.invoices:
-        ready_count = sum(
-            result.status == "Ready"
-            for result in st.session_state.validation
+    if build_disabled:
+        st.caption(
+            "Upload a workbook and select a worksheet "
+            "to enable invoice building."
         )
 
-        warning_count = sum(
-            result.status == "Warning"
-            for result in st.session_state.validation
-        )
-
-        blocked_count = sum(
-            result.status == "Blocked"
-            for result in st.session_state.validation
-        )
-
-        metric_one, metric_two, metric_three = (
-            st.columns(3)
-        )
-
-        metric_one.metric(
-            "Ready",
-            ready_count,
-        )
-
-        metric_two.metric(
-            "Warnings",
-            warning_count,
-        )
-
-        metric_three.metric(
-            "Blocked",
-            blocked_count,
-        )
+    _render_existing_build_summary()

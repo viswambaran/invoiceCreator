@@ -5,10 +5,15 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Literal
 
-from invoice_creator.models.app_invoice import AppInvoice
+from invoice_creator.models.invoice import (
+    Invoice,
+)
 
 
-Severity = Literal["warning", "error"]
+Severity = Literal[
+    "warning",
+    "error",
+]
 
 
 @dataclass
@@ -43,9 +48,6 @@ class InvoiceValidation:
 
     @property
     def summary(self) -> str:
-        if not self.issues:
-            return ""
-
         return " | ".join(
             issue.message
             for issue in self.issues
@@ -53,20 +55,30 @@ class InvoiceValidation:
 
 
 def validate_invoices(
-    invoices: list[AppInvoice],
+    invoices: list[Invoice],
 ) -> list[InvoiceValidation]:
     invoice_numbers = [
-        invoice.invoice_no
+        invoice.invoice_no.strip()
         for invoice in invoices
-        if invoice.invoice_no
+        if invoice.invoice_no.strip()
     ]
 
-    duplicate_counts = Counter(invoice_numbers)
+    duplicate_counts = Counter(
+        invoice_numbers
+    )
 
-    results: list[InvoiceValidation] = []
+    results: list[
+        InvoiceValidation
+    ] = []
 
     for invoice in invoices:
-        issues: list[ValidationIssue] = []
+        issues: list[
+            ValidationIssue
+        ] = []
+
+        invoice_no = (
+            invoice.invoice_no.strip()
+        )
 
         def add_issue(
             severity: Severity,
@@ -76,36 +88,39 @@ def validate_invoices(
             issues.append(
                 ValidationIssue(
                     row_id=invoice.row_id,
-                    invoice_no=invoice.invoice_no,
+                    invoice_no=invoice_no,
                     severity=severity,
                     field=field,
                     message=message,
                 )
             )
 
-        if not invoice.invoice_no:
+        if not invoice_no:
             add_issue(
                 "error",
                 "Invoice No",
                 "Invoice number is missing.",
             )
 
-        if not invoice.service_user:
+        if not invoice.service_user.strip():
             add_issue(
                 "error",
                 "Service User",
                 "Service user is missing.",
             )
 
-        if not invoice.assessor:
+        if not invoice.assessor.strip():
             add_issue(
                 "warning",
                 "Assessor",
                 "Assessor is blank.",
             )
 
-        if invoice.invoice_no and (
-            duplicate_counts[invoice.invoice_no] > 1
+        if (
+            invoice_no
+            and duplicate_counts[
+                invoice_no
+            ] > 1
         ):
             add_issue(
                 "error",
@@ -113,25 +128,36 @@ def validate_invoices(
                 "Duplicate invoice number.",
             )
 
-        if len(invoice.invoice_no) > 24:
+        if len(invoice_no) > 24:
             add_issue(
                 "warning",
                 "Invoice No",
                 "Invoice number is unusually long.",
             )
 
-        if len(invoice.service_user) > 55:
+        if len(
+            invoice.service_user
+        ) > 55:
             add_issue(
                 "warning",
                 "Service User",
-                "Service user text may require font shrinking.",
+                "Service user text may require "
+                "font shrinking.",
             )
 
         if len(invoice.assessor) > 45:
             add_issue(
                 "warning",
                 "Assessor",
-                "Assessor text may require font shrinking.",
+                "Assessor text may require "
+                "font shrinking.",
+            )
+
+        if invoice.invoice_date is None:
+            add_issue(
+                "error",
+                "Invoice Date",
+                "Invoice date is missing.",
             )
 
         if not invoice.lines:
@@ -145,33 +171,89 @@ def validate_invoices(
             add_issue(
                 "warning",
                 "Lines",
-                "Invoice contains more lines than expected.",
+                "Invoice contains more than "
+                "two charge lines.",
+            )
+
+        calculated_net = sum(
+            (
+                line.net
+                for line in invoice.lines
+            ),
+            Decimal("0"),
+        ).quantize(
+            Decimal("0.01")
+        )
+
+        if (
+            calculated_net
+            != invoice.net_amount
+        ):
+            add_issue(
+                "error",
+                "Net Amount",
+                "Net amount does not match "
+                "the invoice lines.",
             )
 
         for line in invoice.lines:
+            if line.units < Decimal("0"):
+                add_issue(
+                    "error",
+                    line.description,
+                    f"{line.description} has "
+                    "negative units.",
+                )
+
             if line.rate < Decimal("0"):
                 add_issue(
                     "error",
                     line.description,
-                    f"{line.description} has a negative rate.",
+                    f"{line.description} has "
+                    "a negative rate.",
                 )
 
-            if line.rate > Decimal("10000"):
+            if line.rate > Decimal(
+                "10000"
+            ):
                 add_issue(
                     "warning",
                     line.description,
-                    f"{line.description} rate is unusually large.",
+                    f"{line.description} rate "
+                    "is unusually large.",
+                )
+
+            expected_line_net = (
+                line.units * line.rate
+            ).quantize(
+                Decimal("0.01")
+            )
+
+            if expected_line_net != line.net:
+                add_issue(
+                    "error",
+                    line.description,
+                    f"{line.description} net "
+                    "does not match units "
+                    "multiplied by rate.",
                 )
 
         expected_total = (
-            invoice.net_amount + invoice.vat
-        ).quantize(Decimal("0.01"))
+            invoice.net_amount
+            + invoice.vat
+        ).quantize(
+            Decimal("0.01")
+        )
 
-        if expected_total != invoice.invoice_total:
+        if (
+            expected_total
+            != invoice.invoice_total
+        ):
             add_issue(
                 "error",
                 "Invoice Total",
-                "Invoice total does not match net plus VAT.",
+                "Invoice total does not "
+                "match net plus VAT.",
             )
 
         if any(
@@ -187,7 +269,7 @@ def validate_invoices(
         results.append(
             InvoiceValidation(
                 row_id=invoice.row_id,
-                invoice_no=invoice.invoice_no,
+                invoice_no=invoice_no,
                 status=status,
                 issues=issues,
             )
