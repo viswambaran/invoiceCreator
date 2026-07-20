@@ -10,48 +10,72 @@ from invoice_creator.ui.tabs.layout import render_layout_tab
 from invoice_creator.ui.tabs.generate import render_generate_tab
 
 
-st.set_page_config(
-    page_title="Invoice Creator",
-    page_icon="📄",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+PAGES = {
+    "Upload & Setup": render_upload_tab,
+    "Review Invoices": render_review_tab,
+    "Mapping": render_mapping_tab,
+    "Layout & Preview": render_layout_tab,
+    "Generate & Download": render_generate_tab,
+}
 
-load_styles()
 
-initialise_state()
+def main() -> None:
+    st.set_page_config(
+        page_title="Invoice Creator",
+        page_icon="📄",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
 
-st.title("📄 Invoice Creator")
+    load_styles()
+    initialise_state()
 
-st.caption(
-    "Generate professional invoice PDFs from Excel."
-)
+    with st.sidebar:
+        st.title("📄 Invoice Creator")
 
-tab_upload,\
-tab_review,\
-tab_mapping,\
-tab_layout,\
-tab_generate = st.tabs(
-    [
-        "Upload & Setup",
-        "Review",
-        "Mapping",
-        "Layout",
-        "Generate"
-    ]
-)
+        st.caption(
+            "Generate invoice PDFs from Excel."
+        )
 
-with tab_upload:
-    render_upload_tab()
+        st.divider()
 
-with tab_review:
-    render_review_tab()
+        selected_page = st.radio(
+            "Navigation",
+            options=list(PAGES.keys()),
+            label_visibility="collapsed",
+        )
 
-with tab_mapping:
-    render_mapping_tab()
+        st.divider()
 
-with tab_layout:
-    render_layout_tab()
+        excel_status = (
+            "Loaded"
+            if st.session_state.excel_file is not None
+            else "Not loaded"
+        )
 
-with tab_generate:
-    render_generate_tab()
+        template_status = (
+            "Uploaded"
+            if st.session_state.template_file is not None
+            else "Default template"
+        )
+
+        st.caption("Current session")
+
+        st.write(f"**Excel:** {excel_status}")
+        st.write(f"**Template:** {template_status}")
+        st.write(
+            f"**Invoices:** {len(st.session_state.invoices)}"
+        )
+
+    st.title(selected_page)
+
+    st.caption(
+        "Create, review and generate invoice PDFs."
+    )
+
+    page_renderer = PAGES[selected_page]
+    page_renderer()
+
+
+if __name__ == "__main__":
+    main()
