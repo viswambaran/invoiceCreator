@@ -7,7 +7,7 @@ import streamlit as st
 PACKAGE_ROOT = (
     Path(__file__)
     .resolve()
-    .parents[1]
+    .parents[2]
 )
 
 MAPPING_FILE = (
