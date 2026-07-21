@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "invoicecreator"
-version = "1.0.1"
+version = "1.0.2"
 description = "Lightweight Streamlit app for generating invoice PDFs from an Excel workbook"
 readme = "README.md"
 requires-python = ">=3.10"
