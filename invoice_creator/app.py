@@ -130,7 +130,7 @@ def _render_sidebar() -> None:
 
         st.markdown(
             f"**Invoice date**  \n"
-            f"{st.session_state.invoice_date.strftime('%d/%m/%Y')}"
+            f"{st.session_state.invoice_date.strftime('%d.%m.%Y')}"
         )
         st.markdown(
             f"**Invoices**  \n{len(st.session_state.invoices)}"

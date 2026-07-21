@@ -181,6 +181,6 @@ class InvoicePDFWriter:
             return ""
 
         if hasattr(value, "strftime"):
-            return value.strftime("%d/%m/%Y")
+            return value.strftime("%d.%m.%Y")
 
         return str(value)

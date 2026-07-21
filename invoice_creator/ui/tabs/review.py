@@ -517,7 +517,7 @@ def render_review_tab() -> None:
             f"**Status:** {validation.status}"
         )
         st.write(
-            f"**Date:** {selected_invoice.invoice_date.strftime('%d/%m/%Y')}"
+            f"**Date:** {selected_invoice.invoice_date.strftime('%d.%m.%Y')}"
         )
         st.write(
             f"**Service user:** {selected_invoice.service_user}"
