@@ -10,8 +10,8 @@ from invoice_creator.models.invoice import Invoice
 from invoice_creator.pdf.writer import InvoicePDFWriter
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TEMPLATES_DIRECTORY = PROJECT_ROOT / "templates"
+PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+TEMPLATES_DIRECTORY = PACKAGE_ROOT / "templates"
 
 DEFAULT_TEMPLATE_PATH = TEMPLATES_DIRECTORY / "Invoice Template.pdf"
 DEFAULT_FIELDS_PATH = TEMPLATES_DIRECTORY / "template_fields.json"

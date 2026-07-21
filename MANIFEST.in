@@ -1,0 +1,2 @@
+recursive-include invoice_creator/templates *
+recursive-include invoice_creator/data *
