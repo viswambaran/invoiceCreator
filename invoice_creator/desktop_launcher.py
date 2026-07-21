@@ -14,10 +14,12 @@ def open_browser() -> None:
 
 
 def main() -> None:
-    app = (
-        Path(__file__).resolve().parent.parent
-        / "__main__.py"
-    )
+    app = Path(__file__).resolve().parent / "__main__.py"
+
+    if not app.exists():
+        raise FileNotFoundError(
+            f"Invoice Creator entry file was not found: {app}"
+        )
 
     threading.Thread(
         target=open_browser,
@@ -26,9 +28,12 @@ def main() -> None:
 
     bootstrap.run(
         str(app),
-        "",
+        False,
         [],
-        {},
+        {
+            "server.port": 8501,
+            "server.headless": True,
+        },
     )
 
 
