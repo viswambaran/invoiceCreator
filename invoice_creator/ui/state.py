@@ -7,6 +7,9 @@ from pathlib import Path
 
 import streamlit as st
 
+from invoice_creator.services.app_paths import default_output_directory
+from invoice_creator.services.settings_service import load_settings
+
 
 WORKFLOW_STEPS = [
     "Upload",
@@ -55,15 +58,7 @@ DEFAULT_STATE: dict[str, Any] = {
     "generation_result": None,
     "generated_zip": None,
     "output_mode": "Save to folder",
-    "output_folder": str(
-        (
-            (Path.home() / "Documents")
-            if (Path.home() / "Documents").exists()
-            else Path.home()
-        )
-        / "Invoice Creator"
-        / "Generated Invoices"
-    ),
+    "output_folder": str(default_output_directory()),
     "create_timestamped_folder": True,
     "overwrite_existing_pdfs": False,
     "open_folder_when_finished": True,
@@ -72,9 +67,13 @@ DEFAULT_STATE: dict[str, Any] = {
 
 
 def initialise_state() -> None:
+    persisted_settings = load_settings()
+
     for key, default_value in DEFAULT_STATE.items():
         if key not in st.session_state:
-            st.session_state[key] = deepcopy(default_value)
+            st.session_state[key] = deepcopy(
+                persisted_settings.get(key, default_value)
+            )
 
 
 def request_workflow_step(step: str) -> None:

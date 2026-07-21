@@ -1,6 +1,13 @@
 from __future__ import annotations
 
+import logging
+
 import streamlit as st
+
+from invoice_creator.app_info import APP_DESCRIPTION, APP_NAME, APP_VERSION
+from invoice_creator.services.app_paths import logs_directory, settings_path
+from invoice_creator.services.logging_service import configure_logging
+from invoice_creator.ui.system_actions import open_directory
 
 from invoice_creator.ui.state import (
     WORKFLOW_STEPS,
@@ -15,6 +22,10 @@ from invoice_creator.ui.tabs.layout import render_layout_tab
 from invoice_creator.ui.tabs.mapping import render_mapping_tab
 from invoice_creator.ui.tabs.review import render_review_tab
 from invoice_creator.ui.tabs.upload import render_upload_tab
+
+
+configure_logging()
+LOGGER = logging.getLogger(__name__)
 
 
 st.set_page_config(
@@ -150,6 +161,8 @@ def _render_sidebar() -> None:
             else:
                 render_layout_tab()
 
+        _render_about()
+
         with st.expander("🗑️ Reset batch"):
             confirmed = st.checkbox(
                 "Clear the current workbook and invoices",
@@ -163,6 +176,24 @@ def _render_sidebar() -> None:
             ):
                 reset_state()
                 st.rerun()
+
+
+
+def _render_about() -> None:
+    with st.sidebar.expander("ℹ️ About and support"):
+        st.markdown(f"**{APP_NAME}**")
+        st.caption(APP_DESCRIPTION)
+        st.markdown(f"**Version**  \n{APP_VERSION}")
+        st.markdown("**Support files**")
+        st.caption(f"Logs: {logs_directory()}")
+        st.caption(f"Settings: {settings_path()}")
+
+        if st.button("Open support logs", key="open_support_logs", width="stretch"):
+            try:
+                open_directory(logs_directory())
+            except Exception:
+                LOGGER.exception("Unable to open support log directory")
+                st.error("The support log folder could not be opened.")
 
 
 def _render_header() -> None:
@@ -237,7 +268,20 @@ def main() -> None:
     _render_header()
     _render_step_cards()
     st.divider()
-    _render_current_page()
+    try:
+        _render_current_page()
+    except Exception as exc:
+        LOGGER.exception("Unhandled application error")
+        st.error(
+            "Invoice Creator could not complete this action. "
+            "Your current batch has not been deleted."
+        )
+        st.info(
+            "Open **About and support** in the sidebar, then send the support log "
+            "to the application administrator."
+        )
+        with st.expander("Technical details"):
+            st.code(f"{type(exc).__name__}: {exc}", language=None)
 
 
 if __name__ == "__main__":

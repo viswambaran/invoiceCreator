@@ -10,6 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from invoice_creator.services.generation_service import generate_invoices
+from invoice_creator.services.settings_service import save_settings
 from invoice_creator.services.zip_service import create_pdf_zip
 from invoice_creator.ui.state import (
     clear_generation_results,
@@ -21,6 +22,18 @@ from invoice_creator.ui.state import (
 OUTPUT_FOLDER = "Save to folder"
 OUTPUT_ZIP = "Download ZIP"
 OUTPUT_BOTH = "Folder + ZIP"
+
+
+def _persist_output_settings() -> None:
+    save_settings(
+        {
+            "output_mode": st.session_state.output_mode,
+            "output_folder": st.session_state.output_folder,
+            "create_timestamped_folder": st.session_state.create_timestamped_folder,
+            "overwrite_existing_pdfs": st.session_state.overwrite_existing_pdfs,
+            "open_folder_when_finished": st.session_state.open_folder_when_finished,
+        }
+    )
 
 
 def _validation_lookup() -> dict[int, object]:
@@ -202,8 +215,12 @@ def _generate(invoices: list) -> None:
                     state="error",
                     expanded=True,
                 )
-                st.error("An unexpected error occurred during PDF generation.")
-                st.exception(exc)
+                st.error(
+                    "Invoice Creator could not generate the PDFs. "
+                    "Check the destination folder and template, then try again."
+                )
+                with st.expander("Technical details"):
+                    st.code(f"{type(exc).__name__}: {exc}", language=None)
 
 
 def _render_generation_results() -> None:
@@ -237,7 +254,8 @@ def _render_generation_results() -> None:
                     _open_folder(output_path)
                 except Exception as exc:
                     st.error("The output folder could not be opened automatically.")
-                    st.exception(exc)
+                    with st.expander("Technical details"):
+                        st.code(f"{type(exc).__name__}: {exc}", language=None)
 
         zip_data = st.session_state.generated_zip
         if zip_data:
@@ -291,6 +309,7 @@ def _render_output_settings() -> None:
         options=[OUTPUT_FOLDER, OUTPUT_ZIP, OUTPUT_BOTH],
         key="output_mode",
         horizontal=True,
+        on_change=_persist_output_settings,
         help=(
             "Save to folder is recommended for normal desktop use. "
             "ZIP is useful for sharing or archiving a batch."
@@ -314,6 +333,7 @@ def _render_output_settings() -> None:
                 "This defaults to the current computer user's Documents folder. "
                 "It does not contain a hardcoded username."
             ),
+            on_change=_persist_output_settings,
         )
 
     with browse_column:
@@ -323,6 +343,15 @@ def _render_output_settings() -> None:
             selected = _choose_folder(Path(st.session_state.output_folder))
             if selected:
                 st.session_state.pending_output_folder = selected
+                save_settings(
+                    {
+                        "output_mode": st.session_state.output_mode,
+                        "output_folder": selected,
+                        "create_timestamped_folder": st.session_state.create_timestamped_folder,
+                        "overwrite_existing_pdfs": st.session_state.overwrite_existing_pdfs,
+                        "open_folder_when_finished": st.session_state.open_folder_when_finished,
+                    }
+                )
                 st.rerun()
             else:
                 st.info(
@@ -337,6 +366,7 @@ def _render_output_settings() -> None:
             "Create timestamped folder",
             key="create_timestamped_folder",
             help="Creates a new subfolder such as 2026-07-21_143015 for each batch.",
+            on_change=_persist_output_settings,
         )
 
     with option_two:
@@ -344,12 +374,14 @@ def _render_output_settings() -> None:
             "Overwrite existing PDFs",
             key="overwrite_existing_pdfs",
             help="When disabled, duplicate filenames receive a numbered suffix.",
+            on_change=_persist_output_settings,
         )
 
     with option_three:
         st.checkbox(
             "Open folder when finished",
             key="open_folder_when_finished",
+            on_change=_persist_output_settings,
         )
 
     resolved = _resolved_output_directory()
