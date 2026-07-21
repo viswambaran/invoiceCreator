@@ -48,7 +48,7 @@ def render_mapping_tab():
     st.dataframe(
         rows,
         hide_index=True,
-        width="stretch",
+        use_container_width=True,
     )
 
     st.info(

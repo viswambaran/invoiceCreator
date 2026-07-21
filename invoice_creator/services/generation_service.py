@@ -6,45 +6,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterable
 
-from invoice_creator.models.invoice import (
-    Invoice,
-)
-from invoice_creator.pdf.writer import (
-    InvoicePDFWriter,
-)
+from invoice_creator.models.invoice import Invoice
+from invoice_creator.pdf.writer import InvoicePDFWriter
 
 
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+TEMPLATES_DIRECTORY = PROJECT_ROOT / "templates"
 
-TEMPLATES_DIRECTORY = (
-    PROJECT_ROOT
-    / "templates"
-)
+DEFAULT_TEMPLATE_PATH = TEMPLATES_DIRECTORY / "Invoice Template.pdf"
+DEFAULT_FIELDS_PATH = TEMPLATES_DIRECTORY / "template_fields.json"
+DEFAULT_TABLE_PATH = TEMPLATES_DIRECTORY / "table_metadata.json"
 
-DEFAULT_TEMPLATE_PATH = (
-    TEMPLATES_DIRECTORY
-    / "Invoice Template.pdf"
-)
-
-DEFAULT_FIELDS_PATH = (
-    TEMPLATES_DIRECTORY
-    / "template_fields.json"
-)
-
-DEFAULT_TABLE_PATH = (
-    TEMPLATES_DIRECTORY
-    / "table_metadata.json"
-)
-
-
-ProgressCallback = Callable[
-    [int, int, str],
-    None,
-]
+ProgressCallback = Callable[[int, int, str], None]
 
 
 @dataclass
@@ -63,56 +36,33 @@ class GenerationFailure:
 @dataclass
 class GenerationResult:
     output_directory: Path
-
-    generated: list[GeneratedInvoice] = field(
-        default_factory=list
-    )
-
-    failures: list[GenerationFailure] = field(
-        default_factory=list
-    )
+    generated: list[GeneratedInvoice] = field(default_factory=list)
+    failures: list[GenerationFailure] = field(default_factory=list)
 
 
-class InvoiceGenerationError(
-    Exception
-):
+class InvoiceGenerationError(Exception):
     pass
 
 
-def _safe_filename(
-    invoice_no: str,
-) -> str:
+def _safe_filename(invoice_no: str) -> str:
     cleaned = re.sub(
         r'[<>:"/\\|?*\x00-\x1f]',
         "_",
         invoice_no.strip(),
     )
-
-    cleaned = cleaned.rstrip(
-        ". "
-    )
-
+    cleaned = cleaned.rstrip(". ")
     return cleaned or "invoice"
 
 
-def _validate_required_file(
-    path: Path,
-    description: str,
-) -> None:
+def _validate_required_file(path: Path, description: str) -> None:
     if not path.exists():
         raise InvoiceGenerationError(
-            (
-                f"{description} was not "
-                f"found: {path}"
-            )
+            f"{description} was not found: {path}"
         )
 
     if not path.is_file():
         raise InvoiceGenerationError(
-            (
-                f"{description} is not "
-                f"a file: {path}"
-            )
+            f"{description} is not a file: {path}"
         )
 
 
@@ -125,35 +75,13 @@ def _prepare_template(
             DEFAULT_TEMPLATE_PATH,
             "Default PDF template",
         )
-
         return DEFAULT_TEMPLATE_PATH
 
     uploaded_template_path = (
-        output_directory
-        / "_uploaded_template.pdf"
+        output_directory / "_uploaded_template.pdf"
     )
-
-    uploaded_template_path.write_bytes(
-        template_bytes
-    )
-
+    uploaded_template_path.write_bytes(template_bytes)
     return uploaded_template_path
-
-
-def _notify_progress(
-    callback: ProgressCallback | None,
-    completed: int,
-    total: int,
-    invoice_no: str,
-) -> None:
-    if callback is None:
-        return
-
-    callback(
-        completed,
-        total,
-        invoice_no,
-    )
 
 
 def generate_invoices(
@@ -163,42 +91,32 @@ def generate_invoices(
     fields_path: Path | None = None,
     table_path: Path | None = None,
     progress_callback: ProgressCallback | None = None,
+    overwrite_existing: bool = True,
 ) -> GenerationResult:
-    invoice_list = list(
-        invoices
-    )
+    invoice_list = list(invoices)
+    total_invoices = len(invoice_list)
 
-    total_invoices = len(
-        invoice_list
-    )
+    if not invoice_list:
+        raise InvoiceGenerationError(
+            "No invoices were supplied for generation."
+        )
 
     if output_directory is None:
         output_directory = Path(
-            tempfile.mkdtemp(
-                prefix="invoice_creator_"
-            )
+            tempfile.mkdtemp(prefix="invoice_creator_")
         )
+    else:
+        output_directory = Path(output_directory).expanduser()
 
-    output_directory.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
+    output_directory.mkdir(parents=True, exist_ok=True)
 
-    resolved_fields_path = (
-        fields_path
-        or DEFAULT_FIELDS_PATH
-    )
-
-    resolved_table_path = (
-        table_path
-        or DEFAULT_TABLE_PATH
-    )
+    resolved_fields_path = fields_path or DEFAULT_FIELDS_PATH
+    resolved_table_path = table_path or DEFAULT_TABLE_PATH
 
     _validate_required_file(
         resolved_fields_path,
         "Template field metadata",
     )
-
     _validate_required_file(
         resolved_table_path,
         "Table metadata",
@@ -218,47 +136,33 @@ def generate_invoices(
     result = GenerationResult(
         output_directory=output_directory
     )
-
     used_filenames: set[str] = set()
 
     for index, invoice in enumerate(
         invoice_list,
         start=1,
     ):
-        invoice_no = str(
-            invoice.invoice_no
-        ).strip()
-
-        base_filename = _safe_filename(
-            invoice_no
-        )
-
+        invoice_no = str(invoice.invoice_no).strip()
+        base_filename = _safe_filename(invoice_no)
         candidate = base_filename
-
         counter = 2
 
-        while (
-            candidate.casefold()
-            in used_filenames
-        ):
-            candidate = (
-                f"{base_filename}_{counter}"
-            )
-
+        while candidate.casefold() in used_filenames:
+            candidate = f"{base_filename}_{counter}"
             counter += 1
 
-        used_filenames.add(
-            candidate.casefold()
-        )
+        used_filenames.add(candidate.casefold())
+        filename = f"{candidate}.pdf"
+        output_path = output_directory / filename
 
-        filename = (
-            f"{candidate}.pdf"
-        )
+        if not overwrite_existing:
+            while output_path.exists():
+                candidate = f"{base_filename}_{counter}"
+                counter += 1
+                filename = f"{candidate}.pdf"
+                output_path = output_directory / filename
 
-        output_path = (
-            output_directory
-            / filename
-        )
+            used_filenames.add(candidate.casefold())
 
         try:
             writer.generate(
@@ -268,11 +172,7 @@ def generate_invoices(
 
             if not output_path.exists():
                 raise InvoiceGenerationError(
-                    (
-                        "The PDF writer completed "
-                        "but did not create an "
-                        "output file."
-                    )
+                    "The PDF writer completed but did not create an output file."
                 )
 
             result.generated.append(
@@ -292,11 +192,18 @@ def generate_invoices(
             )
 
         finally:
-            _notify_progress(
-                callback=progress_callback,
-                completed=index,
-                total=total_invoices,
-                invoice_no=invoice_no,
-            )
+            if progress_callback is not None:
+                progress_callback(
+                    index,
+                    total_invoices,
+                    invoice_no,
+                )
+
+    uploaded_copy = output_directory / "_uploaded_template.pdf"
+    if uploaded_copy.exists():
+        try:
+            uploaded_copy.unlink()
+        except OSError:
+            pass
 
     return result

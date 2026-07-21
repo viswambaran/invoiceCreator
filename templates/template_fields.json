@@ -169,6 +169,34 @@
                     "monospace": false
                 }
             }
+        },
+        "Invoice Date": {
+            "pdf_label": "Invoice Date : ",
+            "page": 1,
+            "cell": {
+                "x0": 467.03,
+                "x1": 541.03
+            },
+            "write_position": {
+                "x": 469.03,
+                "y": 284.7
+            },
+            "align": "left",
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
         }
     }
 }

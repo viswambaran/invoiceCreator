@@ -426,167 +426,145 @@ def _render_existing_build_summary() -> None:
 
 
 def render_upload_tab() -> None:
-    st.header("Upload and Setup")
-
-    st.write(
-        "Upload the Excel workbook and optionally "
-        "replace the default PDF template."
+    st.header("📄 Upload and set up")
+    st.caption(
+        "Complete the four sections below, then build the invoice batch."
     )
 
-    left_column, right_column = (
-        st.columns(
-            [2, 1],
-            gap="large",
-        )
+    st.subheader("1️⃣ Upload workbook")
+    workbook = st.file_uploader(
+        "Excel workbook",
+        type=["xlsx", "xls"],
+        help=(
+            "Each spreadsheet row currently creates one invoice."
+        ),
+        key="excel_workbook_uploader",
     )
 
-    with left_column:
-        workbook = st.file_uploader(
-            "Excel workbook",
-            type=[
-                "xlsx",
-                "xls",
-            ],
-            help=(
-                "Each spreadsheet row currently "
-                "creates one invoice."
-            ),
-            key="excel_workbook_uploader",
+    if workbook is not None:
+        _store_excel(workbook)
+
+    if st.session_state.excel_filename:
+        st.success(
+            f"Workbook ready: **{st.session_state.excel_filename}**",
+            icon="✅",
+        )
+    else:
+        st.info(
+            "Choose the Excel workbook containing the invoice rows."
         )
 
-        if workbook is not None:
-            _store_excel(
-                workbook
-            )
+    st.subheader("2️⃣ Choose worksheet")
 
-        if st.session_state.sheet_names:
-            current_sheet = (
-                st.session_state.selected_sheet
-            )
+    if st.session_state.sheet_names:
+        current_sheet = st.session_state.selected_sheet
 
-            if (
+        if current_sheet not in st.session_state.sheet_names:
+            current_sheet = st.session_state.sheet_names[0]
+
+        selected_sheet = st.selectbox(
+            "Worksheet",
+            options=st.session_state.sheet_names,
+            index=st.session_state.sheet_names.index(
                 current_sheet
-                not in st.session_state.sheet_names
-            ):
-                current_sheet = (
-                    st.session_state
-                    .sheet_names[0]
-                )
+            ),
+            key="worksheet_selector",
+        )
 
-            selected_index = (
-                st.session_state
-                .sheet_names
-                .index(
-                    current_sheet
-                )
+        if selected_sheet != st.session_state.selected_sheet:
+            st.session_state.selected_sheet = selected_sheet
+            clear_invoice_results()
+            st.toast(
+                f"Worksheet changed to {selected_sheet}.",
+                icon="📑",
             )
 
-            selected_sheet = st.selectbox(
-                "Worksheet",
-                options=(
-                    st.session_state.sheet_names
-                ),
-                index=selected_index,
-                key="worksheet_selector",
-            )
+        st.success(
+            f"Worksheet selected: **{st.session_state.selected_sheet}**",
+            icon="✅",
+        )
+    else:
+        st.caption(
+            "Worksheet selection will appear after the workbook is uploaded."
+        )
 
-            if (
-                selected_sheet
-                != st.session_state
-                .selected_sheet
-            ):
-                st.session_state.selected_sheet = (
-                    selected_sheet
+    st.subheader("3️⃣ Invoice settings")
+
+    settings_left, settings_right = st.columns(
+        2,
+        gap="large",
+    )
+
+    with settings_left:
+        selected_date = st.date_input(
+            "Invoice date",
+            value=st.session_state.invoice_date,
+            format="DD/MM/YYYY",
+            help=(
+                "This date appears on every generated invoice. "
+                "Individual dates can still be edited during Review."
+            ),
+        )
+
+        if selected_date != st.session_state.invoice_date:
+            st.session_state.invoice_date = selected_date
+
+            for invoice in st.session_state.invoices:
+                invoice.invoice_date = selected_date
+
+            if st.session_state.invoices:
+                st.session_state.validation = validate_invoices(
+                    st.session_state.invoices
                 )
+                clear_generation_results()
 
-                clear_invoice_results()
+        st.session_state.vat_rate = st.number_input(
+            "VAT percentage",
+            min_value=0.0,
+            max_value=100.0,
+            value=float(st.session_state.vat_rate),
+            step=1.0,
+            format="%.2f",
+        )
 
-                st.toast(
-                    (
-                        f"Worksheet changed to "
-                        f"{selected_sheet}."
-                    ),
-                    icon="📄",
-                )
+    with settings_right:
+        st.session_state.default_units = st.number_input(
+            "Default units",
+            min_value=0.0,
+            value=float(st.session_state.default_units),
+            step=1.0,
+            format="%.2f",
+        )
 
+        st.session_state.include_zero_lines = st.checkbox(
+            "Include zero-value lines",
+            value=st.session_state.include_zero_lines,
+            help=(
+                "Keep BIA Assessment or Authorisation rows even when their value is zero."
+            ),
+        )
+
+        st.info(
+            "Current rule: every spreadsheet row creates one invoice.",
+            icon="ℹ️",
+        )
+
+    with st.expander("Optional PDF template"):
         template = st.file_uploader(
-            "PDF template",
+            "Replacement PDF template",
             type=["pdf"],
             help=(
-                "Optional. Leave empty to use "
-                "the default project template."
+                "Leave empty to use the default project template."
             ),
             key="pdf_template_uploader",
         )
 
         if template is not None:
-            _store_template(
-                template
-            )
+            _store_template(template)
 
         _show_uploaded_file_summary()
 
-    with right_column:
-        st.subheader(
-            "Invoice settings"
-        )
-
-        st.session_state.invoice_date = (
-            st.date_input(
-                "Invoice date",
-                value=(
-                    st.session_state
-                    .invoice_date
-                ),
-                format="DD/MM/YYYY",
-            )
-        )
-
-        st.session_state.vat_rate = (
-            st.number_input(
-                "VAT percentage",
-                min_value=0.0,
-                max_value=100.0,
-                value=float(
-                    st.session_state.vat_rate
-                ),
-                step=1.0,
-                format="%.2f",
-            )
-        )
-
-        st.session_state.default_units = (
-            st.number_input(
-                "Default units",
-                min_value=0.0,
-                value=float(
-                    st.session_state
-                    .default_units
-                ),
-                step=1.0,
-                format="%.2f",
-            )
-        )
-
-        st.session_state.include_zero_lines = (
-            st.checkbox(
-                "Include zero-value lines",
-                value=(
-                    st.session_state
-                    .include_zero_lines
-                ),
-            )
-        )
-
-        st.info(
-            (
-                "Current rule: every spreadsheet "
-                "row creates one invoice."
-            ),
-            icon="ℹ️",
-        )
-
-    st.divider()
+    st.subheader("4️⃣ Build invoices")
 
     build_disabled = not bool(
         st.session_state.excel_bytes
@@ -594,7 +572,7 @@ def render_upload_tab() -> None:
     )
 
     if st.button(
-        "Build Invoices",
+        "Build invoice batch 🚀",
         type="primary",
         width="stretch",
         disabled=build_disabled,
@@ -603,8 +581,7 @@ def render_upload_tab() -> None:
 
     if build_disabled:
         st.caption(
-            "Upload a workbook and select a worksheet "
-            "to enable invoice building."
+            "Upload a workbook and select a worksheet to continue."
         )
 
     _render_existing_build_summary()
