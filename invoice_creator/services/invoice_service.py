@@ -20,20 +20,20 @@ from invoice_creator.models.invoice import (
 )
 
 
-PROJECT_ROOT = (
+PACKAGE_ROOT = (
     Path(__file__)
     .resolve()
-    .parents[2]
+    .parents[1]
 )
 
 DEFAULT_MAPPING_PATH = (
-    PROJECT_ROOT
+    PACKAGE_ROOT
     / "templates"
     / "mapping.json"
 )
 
 DEFAULT_RULES_PATH = (
-    PROJECT_ROOT
+    PACKAGE_ROOT
     / "templates"
     / "mapping_rules.json"
 )

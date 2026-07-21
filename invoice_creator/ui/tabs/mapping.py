@@ -4,14 +4,14 @@ from pathlib import Path
 import streamlit as st
 
 
-PROJECT_ROOT = (
+PACKAGE_ROOT = (
     Path(__file__)
     .resolve()
-    .parents[3]
+    .parents[1]
 )
 
 MAPPING_FILE = (
-    PROJECT_ROOT
+    PACKAGE_ROOT
     / "templates"
     / "mapping.json"
 )
