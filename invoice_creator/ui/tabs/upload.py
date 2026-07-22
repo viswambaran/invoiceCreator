@@ -21,6 +21,17 @@ from invoice_creator.ui.state import (
     request_workflow_step,
 )
 
+from invoice_creator.models.generation_job import GenerationJob
+from invoice_creator.services.profile_loader import ProfileLoader
+
+PROFILE_LOADER = ProfileLoader()
+PROFILES = PROFILE_LOADER.all()
+
+PROFILE_LOOKUP = {
+    profile.display_name: profile
+    for profile in PROFILES
+}
+
 
 def _store_excel(
     uploaded_file,
@@ -75,6 +86,16 @@ def _store_excel(
         if sheets
         else None
     )
+
+    job = st.session_state.current_job
+
+    if job is None:
+        job = GenerationJob()
+        st.session_state.current_job = job
+
+    job.workbook_name = uploaded_file.name
+    job.workbook_bytes = data
+    job.worksheet = st.session_state.selected_sheet
 
     sheet_message = (
         f"{len(sheets)} worksheet"
@@ -549,22 +570,57 @@ def render_upload_tab() -> None:
             icon="ℹ️",
         )
 
-    with st.expander("Optional PDF template"):
-        template = st.file_uploader(
-            "Replacement PDF template",
-            type=["pdf"],
-            help=(
-                "Leave empty to use the default project template."
-            ),
-            key="pdf_template_uploader",
-        )
+    # with st.expander("Optional PDF template"):
+    #     template = st.file_uploader(
+    #         "Replacement PDF template",
+    #         type=["pdf"],
+    #         help=(
+    #             "Leave empty to use the default project template."
+    #         ),
+    #         key="pdf_template_uploader",
+    #     )
 
-        if template is not None:
-            _store_template(template)
+    #     if template is not None:
+    #         _store_template(template)
 
-        _show_uploaded_file_summary()
+    #     _show_uploaded_file_summary()
 
-    st.subheader("4️⃣ Build invoices")
+    st.subheader("4️⃣ Invoice profile")
+
+    profile_names = sorted(PROFILE_LOOKUP.keys())
+
+    current_profile = None
+
+    if st.session_state.current_job:
+        if st.session_state.current_job.profile:
+            current_profile = (
+                st.session_state.current_job.profile.display_name
+            )
+
+    selected_profile = st.selectbox(
+        "Invoice profile",
+        profile_names,
+        index=(
+            profile_names.index(current_profile)
+            if current_profile in profile_names
+            else 0
+        ),
+    )
+
+    job = st.session_state.current_job
+
+    if job is None:
+        job = GenerationJob()
+        st.session_state.current_job = job
+
+    job.profile = PROFILE_LOOKUP[selected_profile]
+
+    st.success(
+        f"Using template: **{selected_profile}**",
+        icon="✅",
+    )
+
+    st.subheader("5️⃣ Build invoices")
 
     build_disabled = not bool(
         st.session_state.excel_bytes

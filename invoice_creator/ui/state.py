@@ -30,6 +30,7 @@ DEFAULT_STATE: dict[str, Any] = {
     "excel_filename": None,
     "sheet_names": [],
     "selected_sheet": None,
+    "current_job": None,
     "workbook_dataframe": None,
 
     "template_file": None,
