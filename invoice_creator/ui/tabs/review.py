@@ -238,9 +238,15 @@ def _render_preview(invoice) -> None:
         with TemporaryDirectory(
             prefix="invoice_preview_"
         ) as directory:
+            job = st.session_state.current_job
+
+            if job is None or job.profile is None:
+                st.error("No invoice profile has been selected.")
+                return
+            
             result = generate_invoices(
                 invoices=[invoice],
-                template_bytes=st.session_state.template_bytes,
+                template_path=st.session_state.current_job.profile.template_path,
                 output_directory=directory,
             )
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from datetime import date
 from decimal import Decimal
-from pathlib import Path
 from typing import BinaryIO
 
 import pandas as pd
@@ -18,23 +17,18 @@ from invoice_creator.mapping.engine import (
 from invoice_creator.models.invoice import (
     Invoice,
 )
-
-
-PACKAGE_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[1]
+from invoice_creator.services.app_paths import (
+    SHARED_DIRECTORY,
 )
 
+
 DEFAULT_MAPPING_PATH = (
-    PACKAGE_ROOT
-    / "templates"
+    SHARED_DIRECTORY
     / "mapping.json"
 )
 
 DEFAULT_RULES_PATH = (
-    PACKAGE_ROOT
-    / "templates"
+    SHARED_DIRECTORY
     / "mapping_rules.json"
 )
 

@@ -8,14 +8,26 @@ from typing import Callable, Iterable
 
 from invoice_creator.models.invoice import Invoice
 from invoice_creator.pdf.writer import InvoicePDFWriter
+from invoice_creator.services.app_paths import (
+    PDF_DIRECTORY,
+    SHARED_DIRECTORY,
+)
 
 
-PACKAGE_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATES_DIRECTORY = PACKAGE_ROOT / "templates"
+DEFAULT_TEMPLATE_PATH = (
+    PDF_DIRECTORY
+    / "Invoice Template.pdf"
+)
 
-DEFAULT_TEMPLATE_PATH = TEMPLATES_DIRECTORY / "Invoice Template.pdf"
-DEFAULT_FIELDS_PATH = TEMPLATES_DIRECTORY / "template_fields.json"
-DEFAULT_TABLE_PATH = TEMPLATES_DIRECTORY / "table_metadata.json"
+DEFAULT_FIELDS_PATH = (
+    SHARED_DIRECTORY
+    / "template_fields.json"
+)
+
+DEFAULT_TABLE_PATH = (
+    SHARED_DIRECTORY
+    / "table_metadata.json"
+)
 
 ProgressCallback = Callable[[int, int, str], None]
 
@@ -66,27 +78,9 @@ def _validate_required_file(path: Path, description: str) -> None:
         )
 
 
-def _prepare_template(
-    output_directory: Path,
-    template_bytes: bytes | None,
-) -> Path:
-    if template_bytes is None:
-        _validate_required_file(
-            DEFAULT_TEMPLATE_PATH,
-            "Default PDF template",
-        )
-        return DEFAULT_TEMPLATE_PATH
-
-    uploaded_template_path = (
-        output_directory / "_uploaded_template.pdf"
-    )
-    uploaded_template_path.write_bytes(template_bytes)
-    return uploaded_template_path
-
-
 def generate_invoices(
     invoices: Iterable[Invoice],
-    template_bytes: bytes | None = None,
+    template_path: Path | None = None,
     output_directory: Path | None = None,
     fields_path: Path | None = None,
     table_path: Path | None = None,
@@ -122,11 +116,16 @@ def generate_invoices(
         "Table metadata",
     )
 
-    template_path = _prepare_template(
-        output_directory=output_directory,
-        template_bytes=template_bytes,
-    )
+    # template_path = _prepare_template(
+    #     output_directory=output_directory,
+    #     template_bytes=template_bytes,
+    # )
 
+    _validate_required_file(
+        template_path,
+        "Invoice template",
+    )
+    
     writer = InvoicePDFWriter(
         template_path=template_path,
         fields_path=resolved_fields_path,

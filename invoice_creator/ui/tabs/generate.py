@@ -151,9 +151,16 @@ def _generate(invoices: list) -> None:
                 status.write(f"Processed {completed} of {total}: {invoice_no}")
 
             try:
+                job = st.session_state.current_job
+
+                if job is None or job.profile is None:
+                    raise RuntimeError(
+                        "No invoice profile has been selected."
+                    )
+
                 result = generate_invoices(
                     invoices=invoices,
-                    template_bytes=st.session_state.template_bytes,
+                    template_path=job.profile.template_path,
                     output_directory=output_directory,
                     progress_callback=update_progress,
                     overwrite_existing=st.session_state.overwrite_existing_pdfs,
