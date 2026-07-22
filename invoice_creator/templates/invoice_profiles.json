@@ -1,0 +1,73 @@
+{
+    "cornwall": {
+        "display_name": "Cornwall Council",
+        "template": "pdf/cornwall.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "cumberland_bia": {
+        "display_name": "Cumberland Council - BIA",
+        "template": "pdf/cumbria/cumberland_bia.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "cumberland_mha": {
+        "display_name": "Cumberland Council - MHA",
+        "template": "pdf/cumbria/cumberland_mha.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "cumberland_rpr": {
+        "display_name": "Cumberland Council - RPR",
+        "template": "pdf/cumbria/cumberland_rpr.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "westmorland_bia": {
+        "display_name": "Westmorland & Furness Council - BIA",
+        "template": "pdf/cumbria/westmorland_bia.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "westmorland_mha": {
+        "display_name": "Westmorland & Furness Council - MHA",
+        "template": "pdf/cumbria/westmorland_mha.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "westmorland_rpr": {
+        "display_name": "Westmorland & Furness Council - RPR",
+        "template": "pdf/cumbria/westmorland_rpr.pdf",
+        "generation_mode": "grouped"
+    },
+
+    "derby": {
+        "display_name": "Derby City Council",
+        "template": "pdf/derby.pdf",
+        "generation_mode": "single"
+    },
+
+    "durham": {
+        "display_name": "Durham County Council",
+        "template": "pdf/durham.pdf",
+        "generation_mode": "single"
+    },
+
+    "wrexham": {
+        "display_name": "Wrexham County Council",
+        "template": "pdf/wrexham.pdf",
+        "generation_mode": "single"
+    },
+
+    "bexley": {
+        "display_name": "London Borough of Bexley",
+        "template": "pdf/bexley.pdf",
+        "generation_mode": "single"
+    },
+
+    "bromley": {
+        "display_name": "London Borough of Bromley",
+        "template": "pdf/bromley.pdf",
+        "generation_mode": "single"
+    }
+}
