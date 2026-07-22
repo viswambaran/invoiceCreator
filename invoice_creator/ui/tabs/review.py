@@ -91,6 +91,7 @@ def _build_dataframe() -> pd.DataFrame:
                 "Invoice Date": invoice.invoice_date,
                 "Service User": invoice.service_user,
                 "Assessor": invoice.assessor,
+                "Comments": invoice.comments,
                 "BIA Assessment": (
                     float(bia_line.rate)
                     if bia_line
@@ -174,6 +175,9 @@ def _apply_edits(
         ).strip()
         invoice.assessor = str(
             row["Assessor"]
+        ).strip()
+        invoice.comments = str(
+            row["Comments"]
         ).strip()
 
         _update_line(
@@ -534,6 +538,10 @@ def render_review_tab() -> None:
         st.write(
             f"**Total:** £{float(selected_invoice.invoice_total):.2f}"
         )
+
+        if selected_invoice.comments:
+            st.write(f"**Comments:** {selected_invoice.comments}"
+            )
 
         if validation.issues:
             for issue in validation.issues:

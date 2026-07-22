@@ -5,6 +5,8 @@ from datetime import date
 from decimal import Decimal
 from typing import BinaryIO
 
+from pathlib import Path
+
 import pandas as pd
 
 from invoice_creator.importers.excel import (

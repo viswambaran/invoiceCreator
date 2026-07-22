@@ -15,6 +15,7 @@ class InvoicePDFWriter:
         "Invoice Date",
         "Service User",
         "Assessor",
+        "Comments",
         "Net Amount",
         "VAT",
         "Invoice Total",
@@ -147,6 +148,13 @@ class InvoicePDFWriter:
             page=page,
             value=invoice.assessor,
             metadata=fields["Assessor"],
+            padding=7,
+        )
+
+        write_value(
+            page=page,
+            value=invoice.comments,
+            metadata=fields["Comments"],
             padding=7,
         )
 

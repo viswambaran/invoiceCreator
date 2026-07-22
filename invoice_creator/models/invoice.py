@@ -24,6 +24,9 @@ class Invoice:
     vat: Decimal
     invoice_total: Decimal
 
+    comments: str = ""
+    page_no: int = 1
+
     row_id: int = 0
     invoice_date: date = field(
         default_factory=date.today
@@ -48,4 +51,6 @@ class Invoice:
             "net_amount": self.net_amount,
             "vat": self.vat,
             "invoice_total": self.invoice_total,
+            "comments": self.comments,
+            "page_no": self.page_no,
         }
