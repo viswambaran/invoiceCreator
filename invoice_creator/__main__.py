@@ -1,9 +1,5 @@
-from invoice_creator.app import main
-
-
-def run() -> None:
-    main()
+from invoice_creator.desktop_launcher import main
 
 
 if __name__ == "__main__":
-    run()
+    main()
