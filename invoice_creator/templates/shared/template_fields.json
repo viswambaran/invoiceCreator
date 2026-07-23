@@ -197,6 +197,63 @@
                     "monospace": false
                 }
             }
+        },
+        "Comments": {
+            "pdf_label": "Comments: ",
+            "page": 1,
+            "cell": {
+                "x0": 43.0,
+                "x1": 394.51
+            },
+            "write_position": {
+                "x": 50.0,
+                "y": 278.0
+            },
+            "align": "left",
+            "multiline": true,
+            "font": {
+                "name": "Arial-BoldMT",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "Page No": {
+            "pdf_label": "Page No : ",
+            "page": 1,
+            "cell": {
+                "x0": 467.03,
+                "x1": 541.03
+            },
+            "write_position": {
+                "x": 469.03,
+                "y": 296.2
+            },
+            "align": "left",
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
         }
     }
 }

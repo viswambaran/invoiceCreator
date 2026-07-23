@@ -1,40 +1,35 @@
 from __future__ import annotations
 
-import threading
-import time
-import webbrowser
-from pathlib import Path
-
-from streamlit.web import bootstrap
-
-
-def open_browser() -> None:
-    time.sleep(2)
-    webbrowser.open("http://localhost:8501")
+import subprocess
+import sys
+from importlib.resources import as_file, files
 
 
 def main() -> None:
-    app = Path(__file__).resolve().parent / "__main__.py"
+    app_resource = files("invoice_creator").joinpath("app.py")
 
-    if not app.exists():
-        raise FileNotFoundError(
-            f"Invoice Creator entry file was not found: {app}"
-        )
+    with as_file(app_resource) as app_path:
+        command = [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            str(app_path),
+            "--server.headless=true",
+            "--browser.gatherUsageStats=false",
+        ]
 
-    threading.Thread(
-        target=open_browser,
-        daemon=True,
-    ).start()
-
-    bootstrap.run(
-        str(app),
-        False,
-        [],
-        {
-            "server.port": 8501,
-            "server.headless": True,
-        },
-    )
+        try:
+            subprocess.run(
+                command,
+                check=True,
+            )
+        except KeyboardInterrupt:
+            pass
+        except subprocess.CalledProcessError as exc:
+            raise SystemExit(
+                f"Invoice Creator failed to start: {exc}"
+            ) from exc
 
 
 if __name__ == "__main__":

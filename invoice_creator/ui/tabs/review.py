@@ -54,9 +54,49 @@ def _money(value) -> Decimal:
     )
 
 
+def _is_grouped_mode() -> bool:
+    job = st.session_state.current_job
+    return bool(
+        job is not None
+        and job.profile is not None
+        and job.profile.grouped
+    )
+
+
 def _build_dataframe() -> pd.DataFrame:
     validation_by_row = _validation_lookup()
     rows: list[dict] = []
+
+    if _is_grouped_mode():
+        for invoice in st.session_state.invoices:
+            validation = validation_by_row[invoice.row_id]
+
+            for line_number, line in enumerate(
+                invoice.lines,
+                start=1,
+            ):
+                rows.append(
+                    {
+                        "Generate": st.session_state.invoice_selection.get(
+                            invoice.row_id,
+                            validation.status != "Blocked",
+                        ),
+                        "Row ID": invoice.row_id,
+                        "Line No": line_number,
+                        "Status": validation.status,
+                        "Invoice No": invoice.invoice_no,
+                        "Invoice Date": invoice.invoice_date,
+                        "Service User": line.service_user,
+                        "Assessor": line.assessor,
+                        "Charge Desc": line.description,
+                        "Units": float(line.units),
+                        "Rate": float(line.rate),
+                        "Net": float(line.net),
+                        "Issues": validation.summary,
+                    }
+                )
+
+        return pd.DataFrame(rows)
 
     for invoice in st.session_state.invoices:
         validation = validation_by_row[invoice.row_id]
@@ -91,6 +131,7 @@ def _build_dataframe() -> pd.DataFrame:
                 "Invoice Date": invoice.invoice_date,
                 "Service User": invoice.service_user,
                 "Assessor": invoice.assessor,
+                "Comments": invoice.comments,
                 "BIA Assessment": (
                     float(bia_line.rate)
                     if bia_line
@@ -159,38 +200,59 @@ def _apply_edits(
 ) -> None:
     invoices_by_row = _invoice_lookup()
 
-    for _, row in edited_dataframe.iterrows():
-        row_id = int(row["Row ID"])
-        invoice = invoices_by_row[row_id]
+    if _is_grouped_mode():
+        for _, row in edited_dataframe.iterrows():
+            row_id = int(row["Row ID"])
+            line_number = int(row["Line No"])
+            invoice = invoices_by_row[row_id]
+            line = invoice.lines[line_number - 1]
 
-        invoice.invoice_no = str(
-            row["Invoice No"]
-        ).strip()
-        invoice.invoice_date = _to_date(
-            row["Invoice Date"]
-        )
-        invoice.service_user = str(
-            row["Service User"]
-        ).strip()
-        invoice.assessor = str(
-            row["Assessor"]
-        ).strip()
+            invoice.invoice_no = str(row["Invoice No"]).strip()
+            invoice.invoice_date = _to_date(row["Invoice Date"])
 
-        _update_line(
-            invoice,
-            "BIA Assessment",
-            _money(row["BIA Assessment"]),
-        )
-        _update_line(
-            invoice,
-            "Authorisation",
-            _money(row["Authorisation"]),
-        )
-        _recalculate_invoice(invoice)
+            line.service_user = str(row["Service User"]).strip()
+            line.assessor = str(row["Assessor"]).strip()
+            line.description = str(row["Charge Desc"]).strip()
+            line.units = _money(row["Units"])
+            line.rate = _money(row["Rate"])
+            line.net = _money(line.units * line.rate)
 
-        st.session_state.invoice_selection[row_id] = bool(
-            row["Generate"]
-        )
+            st.session_state.invoice_selection[row_id] = bool(
+                row["Generate"]
+            )
+
+        for invoice in invoices_by_row.values():
+            if invoice.lines:
+                invoice.service_user = invoice.lines[0].service_user
+                invoice.assessor = invoice.lines[0].assessor
+            _recalculate_invoice(invoice)
+
+    else:
+        for _, row in edited_dataframe.iterrows():
+            row_id = int(row["Row ID"])
+            invoice = invoices_by_row[row_id]
+
+            invoice.invoice_no = str(row["Invoice No"]).strip()
+            invoice.invoice_date = _to_date(row["Invoice Date"])
+            invoice.service_user = str(row["Service User"]).strip()
+            invoice.assessor = str(row["Assessor"]).strip()
+            invoice.comments = str(row["Comments"]).strip()
+
+            _update_line(
+                invoice,
+                "BIA Assessment",
+                _money(row["BIA Assessment"]),
+            )
+            _update_line(
+                invoice,
+                "Authorisation",
+                _money(row["Authorisation"]),
+            )
+            _recalculate_invoice(invoice)
+
+            st.session_state.invoice_selection[row_id] = bool(
+                row["Generate"]
+            )
 
     st.session_state.validation = validate_invoices(
         st.session_state.invoices
@@ -198,9 +260,7 @@ def _apply_edits(
 
     for result in st.session_state.validation:
         if result.status == "Blocked":
-            st.session_state.invoice_selection[
-                result.row_id
-            ] = False
+            st.session_state.invoice_selection[result.row_id] = False
 
     clear_generation_results()
 
@@ -238,10 +298,17 @@ def _render_preview(invoice) -> None:
         with TemporaryDirectory(
             prefix="invoice_preview_"
         ) as directory:
+            job = st.session_state.current_job
+
+            if job is None or job.profile is None:
+                st.error("No invoice profile has been selected.")
+                return
+            
             result = generate_invoices(
                 invoices=[invoice],
-                template_bytes=st.session_state.template_bytes,
+                template_path=job.profile.template_path,
                 output_directory=directory,
+                generation_mode=job.profile.generation_mode
             )
 
             if result.failures:
@@ -379,54 +446,89 @@ def render_review_tab() -> None:
             dataframe["Status"] == status_filter
         ]
 
+    grouped_mode = _is_grouped_mode()
+
+    disabled_columns = [
+        "Row ID",
+        "Status",
+        "Net",
+        "Issues",
+    ]
+
+    if grouped_mode:
+        disabled_columns.append("Line No")
+    else:
+        disabled_columns.extend(["VAT", "Total"])
+
+    column_config = {
+        "Generate": st.column_config.CheckboxColumn(
+            "Generate",
+            help="Include this invoice in the PDF batch.",
+        ),
+        "Row ID": None,
+        "Invoice Date": st.column_config.DateColumn(
+            "Invoice Date",
+            format="DD/MM/YYYY",
+        ),
+        "Net": st.column_config.NumberColumn(
+            "Net",
+            format="£ %.2f",
+        ),
+    }
+
+    if grouped_mode:
+        column_config.update(
+            {
+                "Line No": st.column_config.NumberColumn(
+                    "Line",
+                    format="%d",
+                ),
+                "Units": st.column_config.NumberColumn(
+                    "Units",
+                    min_value=0.0,
+                    step=1.0,
+                ),
+                "Rate": st.column_config.NumberColumn(
+                    "Rate",
+                    min_value=0.0,
+                    step=1.0,
+                    format="£ %.2f",
+                ),
+            }
+        )
+    else:
+        column_config.update(
+            {
+                "BIA Assessment": st.column_config.NumberColumn(
+                    "BIA Assessment",
+                    min_value=0.0,
+                    step=1.0,
+                    format="£ %.2f",
+                ),
+                "Authorisation": st.column_config.NumberColumn(
+                    "Authorisation",
+                    min_value=0.0,
+                    step=1.0,
+                    format="£ %.2f",
+                ),
+                "VAT": st.column_config.NumberColumn(
+                    "VAT",
+                    format="£ %.2f",
+                ),
+                "Total": st.column_config.NumberColumn(
+                    "Total",
+                    format="£ %.2f",
+                ),
+            }
+        )
+
     edited_dataframe = st.data_editor(
         dataframe,
         hide_index=True,
         width="stretch",
         num_rows="fixed",
-        disabled=[
-            "Row ID",
-            "Status",
-            "Net",
-            "VAT",
-            "Total",
-            "Issues",
-        ],
-        column_config={
-            "Generate": st.column_config.CheckboxColumn(
-                "Generate",
-                help="Include this invoice in the PDF batch.",
-            ),
-            "Row ID": None,
-            "Invoice Date": st.column_config.DateColumn(
-                "Invoice Date",
-                format="DD/MM/YYYY",
-            ),
-            "BIA Assessment": st.column_config.NumberColumn(
-                "BIA Assessment",
-                min_value=0.0,
-                step=1.0,
-                format="£ %.2f",
-            ),
-            "Authorisation": st.column_config.NumberColumn(
-                "Authorisation",
-                min_value=0.0,
-                step=1.0,
-                format="£ %.2f",
-            ),
-            "Net": st.column_config.NumberColumn(
-                "Net",
-                format="£ %.2f",
-            ),
-            "VAT": st.column_config.NumberColumn(
-                "VAT",
-                format="£ %.2f",
-            ),
-            "Total": st.column_config.NumberColumn(
-                "Total",
-                format="£ %.2f",
-            ),
-        },
+        disabled=disabled_columns,
+        column_config=column_config,
         key="invoice_review_editor",
     )
 
@@ -528,6 +630,10 @@ def render_review_tab() -> None:
         st.write(
             f"**Total:** £{float(selected_invoice.invoice_total):.2f}"
         )
+
+        if selected_invoice.comments:
+            st.write(f"**Comments:** {selected_invoice.comments}"
+            )
 
         if validation.issues:
             for issue in validation.issues:

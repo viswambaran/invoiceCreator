@@ -50,6 +50,12 @@ class ExcelImporter:
             for column in dataframe.columns
         ]
 
+        dataframe = dataframe.dropna(
+            how="all",
+        ).reset_index(
+            drop=True
+        )
+
         return dataframe
 
     def load_rows(self) -> list[dict]:

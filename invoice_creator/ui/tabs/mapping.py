@@ -1,18 +1,14 @@
 import json
-from pathlib import Path
 
 import streamlit as st
 
-
-PACKAGE_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
+from invoice_creator.services.app_paths import (
+    SHARED_DIRECTORY,
 )
 
+
 MAPPING_FILE = (
-    PACKAGE_ROOT
-    / "templates"
+    SHARED_DIRECTORY
     / "mapping.json"
 )
 

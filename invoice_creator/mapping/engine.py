@@ -115,6 +115,10 @@ class MappingEngine:
                 row,
                 "assessor",
             ),
+            comments=self.get_comments(
+                row,
+            ),
+            page_no=1,
             lines=invoice_lines,
             net_amount=net_amount,
             vat=vat,
@@ -213,6 +217,19 @@ class MappingEngine:
             f"Unsupported mapping type "
             f"{mapping_type!r} for '{field}'."
         )
+    
+    def get_comments(
+        self,
+        row: dict,
+    ) -> str:
+        po = self._clean_text(
+            row.get("PO Number")
+        )
+
+        if not po:
+            return ""
+
+        return f"PO {po}"
 
     def _read_mapped_units(
         self,

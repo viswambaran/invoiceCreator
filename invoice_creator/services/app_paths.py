@@ -7,14 +7,59 @@ from pathlib import Path
 from invoice_creator.app_info import APP_NAME
 
 
+# --------------------------------------------------
+# Application directories
+# --------------------------------------------------
+
+PACKAGE_DIRECTORY = Path(__file__).resolve().parents[1]
+
+TEMPLATES_DIRECTORY = (
+    PACKAGE_DIRECTORY
+    / "templates"
+)
+
+SHARED_DIRECTORY = (
+    TEMPLATES_DIRECTORY
+    / "shared"
+)
+
+PDF_DIRECTORY = (
+    TEMPLATES_DIRECTORY
+    / "pdf"
+)
+
+
+# --------------------------------------------------
+# User directories
+# --------------------------------------------------
+
 def user_data_directory() -> Path:
     """Return a writable, per-user application-data directory."""
+
     if sys.platform.startswith("win"):
-        base = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+        base = Path(
+            os.environ.get(
+                "LOCALAPPDATA",
+                Path.home() / "AppData" / "Local",
+            )
+        )
+
     elif sys.platform == "darwin":
-        base = Path.home() / "Library" / "Application Support"
+        base = (
+            Path.home()
+            / "Library"
+            / "Application Support"
+        )
+
     else:
-        base = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
+        base = Path(
+            os.environ.get(
+                "XDG_DATA_HOME",
+                Path.home()
+                / ".local"
+                / "share",
+            )
+        )
 
     return base / APP_NAME
 
@@ -29,6 +74,17 @@ def logs_directory() -> Path:
 
 def default_output_directory() -> Path:
     home = Path.home()
+
     documents = home / "Documents"
-    base = documents if documents.exists() else home
-    return base / APP_NAME / "Generated Invoices"
+
+    base = (
+        documents
+        if documents.exists()
+        else home
+    )
+
+    return (
+        base
+        / APP_NAME
+        / "Generated Invoices"
+    )
