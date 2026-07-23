@@ -177,60 +177,33 @@ def _show_uploaded_file_summary() -> None:
 
 def _build() -> None:
     if not st.session_state.excel_bytes:
-        st.error(
-            "Upload an Excel workbook first."
-        )
+        st.error("Upload an Excel workbook first.")
         return
 
     if not st.session_state.selected_sheet:
-        st.error(
-            "Select a worksheet first."
-        )
+        st.error("Select a worksheet first.")
         return
 
-    progress = st.progress(
-        0,
-        text="Preparing workbook...",
-    )
+    progress = st.progress(0, text="Preparing workbook...")
 
     try:
-        with st.status(
-            "Building invoices...",
-            expanded=True,
-        ) as status:
-            status.write(
-                "Reading the selected worksheet."
-            )
-
-            progress.progress(
-                15,
-                text="Reading worksheet...",
-            )
+        with st.status("Building invoices...", expanded=True) as status:
+            status.write("Reading the selected worksheet.")
+            progress.progress(15, text="Reading worksheet...")
 
             dataframe = load_workbook(
                 st.session_state.excel_bytes,
                 st.session_state.selected_sheet,
             )
 
-            row_count = len(
-                dataframe.index
-            )
-
+            row_count = len(dataframe.index)
             status.write(
-                (
-                    f"Loaded {row_count} spreadsheet "
-                    f"{'row' if row_count == 1 else 'rows'}."
-                )
+                f"Loaded {row_count} spreadsheet "
+                f"{'row' if row_count == 1 else 'rows'}."
             )
 
-            progress.progress(
-                35,
-                text="Checking required columns...",
-            )
-
-            missing = missing_columns(
-                dataframe
-            )
+            progress.progress(35, text="Checking required columns...")
+            missing = missing_columns(dataframe)
 
             if missing:
                 status.update(
@@ -238,83 +211,50 @@ def _build() -> None:
                     state="error",
                     expanded=True,
                 )
-
                 progress.empty()
-
                 st.error(
                     "Missing required columns:\n\n"
-                    + "\n".join(
-                        f"- {column}"
-                        for column in missing
-                    )
+                    + "\n".join(f"- {column}" for column in missing)
                 )
                 return
 
-            status.write(
-                "Required columns are present."
-            )
+            status.write("Required columns are present.")
+            progress.progress(55, text="Creating invoice records...")
 
-            progress.progress(
-                55,
-                text="Creating invoice records...",
+            job = st.session_state.current_job
+            generation_mode = (
+                job.profile.generation_mode
+                if job is not None and job.profile is not None
+                else "single"
             )
 
             invoices = build_invoices(
                 dataframe=dataframe,
-                invoice_date=(
-                    st.session_state.invoice_date
-                ),
-                vat_rate=Decimal(
-                    str(
-                        st.session_state.vat_rate
-                    )
-                ),
+                invoice_date=st.session_state.invoice_date,
+                vat_rate=Decimal(str(st.session_state.vat_rate)),
                 default_units=Decimal(
-                    str(
-                        st.session_state
-                        .default_units
-                    )
+                    str(st.session_state.default_units)
                 ),
                 include_zero_lines=(
-                    st.session_state
-                    .include_zero_lines
+                    st.session_state.include_zero_lines
                 ),
+                generation_mode=generation_mode,
             )
 
             status.write(
-                (
-                    f"Created {len(invoices)} "
-                    f"{'invoice' if len(invoices) == 1 else 'invoices'}."
-                )
+                f"Created {len(invoices)} "
+                f"{'invoice' if len(invoices) == 1 else 'invoices'}."
             )
 
-            progress.progress(
-                80,
-                text="Validating invoices...",
-            )
+            progress.progress(80, text="Validating invoices...")
+            validation = validate_invoices(invoices)
 
-            validation = validate_invoices(
-                invoices
-            )
-
-            st.session_state.workbook_dataframe = (
-                dataframe
-            )
-
+            st.session_state.workbook_dataframe = dataframe
             st.session_state.invoices = invoices
-
-            st.session_state.validation = (
-                validation
-            )
-
+            st.session_state.validation = validation
             st.session_state.invoice_selection = {
-                invoice.row_id: (
-                    result.status != "Blocked"
-                )
-                for invoice, result in zip(
-                    invoices,
-                    validation,
-                )
+                invoice.row_id: result.status != "Blocked"
+                for invoice, result in zip(invoices, validation)
             }
 
             clear_generation_results()
@@ -323,68 +263,48 @@ def _build() -> None:
                 result.status == "Ready"
                 for result in validation
             )
-
             warning_count = sum(
                 result.status == "Warning"
                 for result in validation
             )
-
             blocked_count = sum(
                 result.status == "Blocked"
                 for result in validation
             )
 
-            progress.progress(
-                100,
-                text="Invoice build complete.",
-            )
-
+            progress.progress(100, text="Invoice build complete.")
             status.write(
-                (
-                    f"Ready: {ready_count} · "
-                    f"Warnings: {warning_count} · "
-                    f"Blocked: {blocked_count}"
-                )
+                f"Ready: {ready_count} · "
+                f"Warnings: {warning_count} · "
+                f"Blocked: {blocked_count}"
             )
-
             status.update(
                 label=(
-                    f"Build complete — "
-                    f"{len(invoices)} invoices created"
+                    f"Build complete — {len(invoices)} invoices created"
                 ),
                 state="complete",
                 expanded=False,
             )
 
         queue_toast(
-            (
-                f"Upload processed successfully. "
-                f"{len(invoices)} invoices were created."
-            ),
+            f"Upload processed successfully. "
+            f"{len(invoices)} invoices were created.",
             icon="✅",
         )
-
-        request_workflow_step(
-            "Review"
-        )
-
+        request_workflow_step("Review")
         st.rerun()
 
     except InvoiceBuildError as exc:
         progress.empty()
-
-        st.error(
-            str(exc)
-        )
+        st.error(str(exc))
 
     except Exception as exc:
         progress.empty()
-
         st.error(
             "An unexpected error occurred while building invoices."
         )
-
         st.exception(exc)
+
 
 
 def _render_existing_build_summary() -> None:

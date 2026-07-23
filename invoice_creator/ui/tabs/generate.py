@@ -164,6 +164,7 @@ def _generate(invoices: list) -> None:
                     output_directory=output_directory,
                     progress_callback=update_progress,
                     overwrite_existing=st.session_state.overwrite_existing_pdfs,
+                    generation_mode=job.profile.generation_mode
                 )
 
                 generated_paths = [item.path for item in result.generated]

@@ -5,15 +5,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Literal
 
-from invoice_creator.models.invoice import (
-    Invoice,
-)
+from invoice_creator.models.invoice import Invoice
 
 
-Severity = Literal[
-    "warning",
-    "error",
-]
+Severity = Literal["warning", "error"]
 
 
 @dataclass
@@ -62,23 +57,12 @@ def validate_invoices(
         for invoice in invoices
         if invoice.invoice_no.strip()
     ]
-
-    duplicate_counts = Counter(
-        invoice_numbers
-    )
-
-    results: list[
-        InvoiceValidation
-    ] = []
+    duplicate_counts = Counter(invoice_numbers)
+    results: list[InvoiceValidation] = []
 
     for invoice in invoices:
-        issues: list[
-            ValidationIssue
-        ] = []
-
-        invoice_no = (
-            invoice.invoice_no.strip()
-        )
+        issues: list[ValidationIssue] = []
+        invoice_no = invoice.invoice_no.strip()
 
         def add_issue(
             severity: Severity,
@@ -116,12 +100,7 @@ def validate_invoices(
                 "Assessor is blank.",
             )
 
-        if (
-            invoice_no
-            and duplicate_counts[
-                invoice_no
-            ] > 1
-        ):
+        if invoice_no and duplicate_counts[invoice_no] > 1:
             add_issue(
                 "error",
                 "Invoice No",
@@ -135,22 +114,18 @@ def validate_invoices(
                 "Invoice number is unusually long.",
             )
 
-        if len(
-            invoice.service_user
-        ) > 55:
+        if len(invoice.service_user) > 55:
             add_issue(
                 "warning",
                 "Service User",
-                "Service user text may require "
-                "font shrinking.",
+                "Service user text may require font shrinking.",
             )
 
         if len(invoice.assessor) > 45:
             add_issue(
                 "warning",
                 "Assessor",
-                "Assessor text may require "
-                "font shrinking.",
+                "Assessor text may require font shrinking.",
             )
 
         if invoice.invoice_date is None:
@@ -167,104 +142,59 @@ def validate_invoices(
                 "Invoice has no charge lines.",
             )
 
-        if len(invoice.lines) > 2:
+        if (
+            invoice.generation_mode == "single"
+            and len(invoice.lines) > 2
+        ):
             add_issue(
                 "warning",
                 "Lines",
-                "Invoice contains more than "
-                "two charge lines.",
-            )
-
-        calculated_net = sum(
-            (
-                line.net
-                for line in invoice.lines
-            ),
-            Decimal("0"),
-        ).quantize(
-            Decimal("0.01")
-        )
-
-        if (
-            calculated_net
-            != invoice.net_amount
-        ):
-            add_issue(
-                "error",
-                "Net Amount",
-                "Net amount does not match "
-                "the invoice lines.",
+                "Invoice contains more than two charge lines.",
             )
 
         for line in invoice.lines:
-            if line.units < Decimal("0"):
-                add_issue(
-                    "error",
-                    line.description,
-                    f"{line.description} has "
-                    "negative units.",
-                )
-
             if line.rate < Decimal("0"):
                 add_issue(
                     "error",
                     line.description,
-                    f"{line.description} has "
-                    "a negative rate.",
+                    f"{line.description} has a negative rate.",
                 )
 
-            if line.rate > Decimal(
-                "10000"
-            ):
+            if line.rate > Decimal("10000"):
                 add_issue(
                     "warning",
                     line.description,
-                    f"{line.description} rate "
-                    "is unusually large.",
+                    f"{line.description} rate is unusually large.",
                 )
 
-            expected_line_net = (
-                line.units * line.rate
-            ).quantize(
-                Decimal("0.01")
+        calculated_net = sum(
+            (line.net for line in invoice.lines),
+            Decimal("0.00"),
+        ).quantize(Decimal("0.01"))
+
+        if calculated_net != invoice.net_amount:
+            add_issue(
+                "error",
+                "Net Amount",
+                "Net amount does not match the invoice lines.",
             )
 
-            if expected_line_net != line.net:
-                add_issue(
-                    "error",
-                    line.description,
-                    f"{line.description} net "
-                    "does not match units "
-                    "multiplied by rate.",
-                )
-
         expected_total = (
-            invoice.net_amount
-            + invoice.vat
-        ).quantize(
-            Decimal("0.01")
-        )
+            invoice.net_amount + invoice.vat
+        ).quantize(Decimal("0.01"))
 
-        if (
-            expected_total
-            != invoice.invoice_total
-        ):
+        if expected_total != invoice.invoice_total:
             add_issue(
                 "error",
                 "Invoice Total",
-                "Invoice total does not "
-                "match net plus VAT.",
+                "Invoice total does not match net amount plus VAT.",
             )
 
-        if any(
-            issue.severity == "error"
-            for issue in issues
-        ):
+        status = "Ready"
+        if any(issue.severity == "error" for issue in issues):
             status = "Blocked"
         elif issues:
             status = "Warning"
-        else:
-            status = "Ready"
 
         results.append(
             InvoiceValidation(

@@ -187,5 +187,59 @@
             "x0": 452.0,
             "x1": 552.44
         }
+    },
+    "line_identity_columns": {
+        "service_user": {
+            "cell": {
+                "x0": 43.0,
+                "x1": 179.4
+            },
+            "write_position": {
+                "x": 50.0,
+                "y": 357.0
+            },
+            "align": "left",
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        },
+        "assessor": {
+            "cell": {
+                "x0": 179.4,
+                "x1": 301.4
+            },
+            "write_position": {
+                "x": 186.4,
+                "y": 357.0
+            },
+            "align": "left",
+            "font": {
+                "name": "Arial,Bold",
+                "size": 8.27,
+                "colour": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0
+                },
+                "style": {
+                    "bold": true,
+                    "italic": false,
+                    "serif": false,
+                    "monospace": false
+                }
+            }
+        }
     }
 }
